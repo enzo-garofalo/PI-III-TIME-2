@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "90717640785",
+    "project_id": "superid-aaa73",
+    "storage_bucket": "superid-aaa73.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90717640785:android:acf9615fddfb977b908070",
+        "android_client_info": {
+          "package_name": "com.time2.superid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUD8ddKYTYDi1Z2i45PLZ94kiIFBKdhAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
