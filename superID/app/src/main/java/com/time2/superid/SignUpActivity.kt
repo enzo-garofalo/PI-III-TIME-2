@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.time2.superid.ui.theme.SuperIDTheme
+import com.time2.superid.utils.showShortToast
 
 class SignUpActivity : ComponentActivity()
 {
@@ -48,15 +49,11 @@ fun createAccount(email : String, password : String, context: Context)
     auth.createUserWithEmailAndPassword(email, password)
         .addOnSuccessListener {
             Log.w("CreateAccount", "Account Created")
-
-            Toast.makeText(
-                context,
-                "Welcome to superID",
-                Toast.LENGTH_SHORT
-            ).show()
+            showShortToast(context,"Welcome to superID")
         }
         .addOnFailureListener {
             e -> Log.e("CreateAccount", "Failed To create account")
+            showShortToast(context,"Welcome to superID")
 
             Toast.makeText(
                 context,
@@ -97,7 +94,13 @@ fun SignUpView( modifier: Modifier = Modifier)
         )
 
         Button(
-            onClick = { createAccount(email, password, context) }
+            onClick = {
+                if(email.isBlank() || password.isBlank()){
+                    showShortToast(context, "Please fill in all the fields!")
+                }else{
+                    createAccount(email, password, context)
+                }
+            }
         ) {
             Text(
                 "Sign Up"
