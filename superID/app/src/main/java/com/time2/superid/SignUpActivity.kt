@@ -23,6 +23,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.showShortToast
+import android.provider.Settings
 
 class SignUpActivity : ComponentActivity()
 {
@@ -43,11 +44,12 @@ fun createAccount(email : String, password : String, name : String, context: Con
     auth.createUserWithEmailAndPassword(email, password)
         .addOnSuccessListener { authResult ->
             // Getting UID
-            val userID = authResult.user?.uid
+            val userID = authResult.user?.uid.toString()
+            val imei : String = getDeviceIdentifier(context)
 
             Log.w("CreateAccount", "Account Created")
             showShortToast(context,"Welcome to superID")
-            saveUserToFirestore(email, name, password,  userID.toString(), context)
+            saveUserToFirestore(email, name, password,  userID, imei, context)
         }
         .addOnFailureListener {
             e -> Log.e("CreateAccount", "Failed To create account")
@@ -55,15 +57,27 @@ fun createAccount(email : String, password : String, name : String, context: Con
         }
 }
 
-fun saveUserToFirestore(email: String,  name: String, password: String, uid : String, context: Context)
+fun getDeviceIdentifier(context: Context) : String
+{
+    // Return device IMEI
+    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+}
+
+fun saveUserToFirestore(
+    email: String,
+    name: String,
+    password: String,
+    uid : String,
+    imei : String,
+    context: Context)
 {
     // Creating Document
     val userData = hashMapOf(
-        "email" to email,
-        "name" to name,
-        "password" to password,
+        "EMAIL" to email,
+        "NAME" to name,
+        "PASSWORD " to password,
         "UID" to uid,
-        "IMEI" to "imei to be implemented"
+        "IMEI" to imei
     )
 
     // Adding user to Firestore
@@ -84,7 +98,6 @@ fun SignUpView( modifier: Modifier = Modifier)
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
 
-    var isFocused by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
