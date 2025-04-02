@@ -1,6 +1,7 @@
 package com.time2.superid
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -50,6 +51,10 @@ fun createAccount(email : String, password : String, name : String, context: Con
             Log.w("CreateAccount", "Account Created")
             showShortToast(context,"Welcome to superID")
             saveUserToFirestore(email, name, password,  userID, imei, context)
+
+            // Redirecting user to another activity
+            val intent = Intent(context, HomeActivity::class.java)
+            context.startActivity(intent)
         }
         .addOnFailureListener {
             e -> Log.e("CreateAccount", "Failed To create account")
