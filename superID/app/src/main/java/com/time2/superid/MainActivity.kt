@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("Você está logado no SuperID!")
+                        Text("Você está logado no SuperID!!")
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = {
                             auth.signOut()
