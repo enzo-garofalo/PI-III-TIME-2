@@ -15,30 +15,30 @@
         android:theme="@style/Theme.SuperID"
         tools:targetApi="31">
         <activity
-            android:name=".SignUpActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".SignUpActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SuperID">
-        </activity>
+            android:theme="@style/Theme.SuperID" />
         <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SuperID">
-
-        </activity>
-        <activity android:name=".MainActivity" />
+            android:theme="@style/Theme.SuperID" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SuperID" />
     </application>
 
 </manifest>

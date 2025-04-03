@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -87,6 +88,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -145,6 +147,16 @@ fun LoginScreen(
             } else {
                 Text("Login")
             }
+        }
+
+        //Botão que vai para a activity de SignUp
+        Button(
+            onClick = {
+                context.startActivity(Intent(context, SignUpActivity::class.java))
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Cadastrar-se")
         }
 
         // Exibe mensagem de erro, se houver
