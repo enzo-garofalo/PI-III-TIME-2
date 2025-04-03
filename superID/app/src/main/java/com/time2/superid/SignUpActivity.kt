@@ -25,12 +25,27 @@ import com.google.firebase.firestore.firestore
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.showShortToast
 import android.provider.Settings
+import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 
 class SignUpActivity : ComponentActivity()
 {
+    private val auth : FirebaseAuth = Firebase.auth
+    private val TAG  : String = "SignUp Activity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Check if user is logged in
+        if(auth.currentUser != null)
+        {
+            Log.i(TAG, "User already logged in")
+            showShortToast(this, "User already logged in")
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+
         setContent{
             SuperIDTheme {
                 SignUpCompose()
@@ -53,8 +68,7 @@ fun createAccount(email : String, password : String, name : String, context: Con
             saveUserToFirestore(email, name, password,  userID, imei, context)
 
             // Redirecting user to another activity
-            val intent = Intent(context, HomeActivity::class.java)
-            context.startActivity(intent)
+            context.startActivity(Intent(context, HomeActivity::class.java))
         }
         .addOnFailureListener {
             e -> Log.e("CreateAccount", "Failed To create account")
@@ -102,39 +116,42 @@ fun SignUpView( modifier: Modifier = Modifier)
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     Column(
-        modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
-            "SignUp!"
+            "SuperID"
         )
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.DarkGray,
-                unfocusedLabelColor = Color.DarkGray,
-                unfocusedTextColor = Color.Black
-            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Name") },
-            colors =  OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.DarkGray,
-                unfocusedLabelColor = Color.DarkGray,
-                unfocusedTextColor = Color.Black
-            )
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = password,
@@ -142,25 +159,32 @@ fun SignUpView( modifier: Modifier = Modifier)
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.DarkGray,
-                unfocusedLabelColor = Color.DarkGray,
-                unfocusedTextColor = Color.Black
-            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
                 if( email.isBlank() || name.isBlank() || password.isBlank() ){
                     showShortToast(context, "Please fill in all the fields!")
                 }else{
+                    isLoading = true
                     createAccount(email, name, password, context)
                 }
-            }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text(
-                "Sign Up"
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text("Sign Up")
+            }
         }
 
     }
