@@ -8,32 +8,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.time2.superid.ui.theme.SuperIDTheme
+import com.time2.superid.utils.AESEncryption
 
 class SignUpActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -59,7 +40,6 @@ class SignUpActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         auth = Firebase.auth
         db = Firebase.firestore
@@ -85,47 +65,67 @@ class SignUpActivity : ComponentActivity() {
     private fun criarConta(nome: String, email: String, senha: String, contexto: Context) {
         val deviceId = getDeviceId(contexto)
 
-
         Toast.makeText(contexto, "Criando conta...", Toast.LENGTH_SHORT).show()
 
-        auth.createUserWithEmailAndPassword(email, senha)
-            .addOnSuccessListener { resultado ->
-                val usuario = resultado.user
-                usuario?.let {
+        try {
+            // Criptografar a senha antes de armazenar no Firestore
+            val senhaCriptografada = AESEncryption.encrypt(senha)
 
-                    it.sendEmailVerification()
+            auth.createUserWithEmailAndPassword(email, senha)
+                .addOnSuccessListener { resultado ->
+                    val usuario = resultado.user
+                    usuario?.let {
+                        // Enviar email de verificação
+                        it.sendEmailVerification()
 
-                    val dadosUsuario = hashMapOf(
-                        "uid" to it.uid,
-                        "deviceId" to deviceId,
-                        "nome" to nome,
-                        "email" to email,
-                        "dataRegistro" to com.google.firebase.Timestamp.now(),
-                        "verificado" to false
-                    )
+                        // Criar objeto com os dados do usuário, incluindo senha criptografada
+                        val dadosUsuario = hashMapOf(
+                            "uid" to it.uid,
+                            "deviceId" to deviceId,
+                            "nome" to nome,
+                            "email" to email,
+                            "senhaCriptografada" to senhaCriptografada, // Senha criptografada
+                            "dataRegistro" to com.google.firebase.Timestamp.now(),
+                            "verificado" to false
+                        )
 
+                        // Salvar no Firestore usando a UID como documento ID
+                        db.collection("usuarios").document(it.uid)
+                            .set(dadosUsuario)
+                            .addOnSuccessListener {
+                                Log.d("Cadastro", "Dados salvos no Firestore com sucesso")
+                                Toast.makeText(contexto, "Conta criada com sucesso! Verifique seu email.", Toast.LENGTH_LONG).show()
 
-                    db.collection("usuarios").document(it.uid)
-                        .set(dadosUsuario)
-                        .addOnSuccessListener {
-                            Log.d("Cadastro", "Dados salvos no Firestore com sucesso")
-                            Toast.makeText(contexto, "Conta criada com sucesso! Verifique seu email.", Toast.LENGTH_LONG).show()
-                            // Aqui você pode redirecionar para outra Activity
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("Cadastro", "Erro ao salvar no Firestore: ${e.message}")
-                            Toast.makeText(contexto, "Conta criada, mas houve um erro ao salvar seus dados", Toast.LENGTH_LONG).show()
-                        }
+                                // Apenas para teste - demonstrar que a criptografia funciona
+                                try {
+                                    val senhaDecriptografada = AESEncryption.decrypt(senhaCriptografada)
+                                    Log.d("Criptografia", "Senha original: $senha")
+                                    Log.d("Criptografia", "Senha criptografada: $senhaCriptografada")
+                                    Log.d("Criptografia", "Senha descriptografada: $senhaDecriptografada")
+                                } catch (e: Exception) {
+                                    Log.e("Criptografia", "Erro ao descriptografar: ${e.message}")
+                                }
+
+                                // Aqui você pode redirecionar para outra Activity
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Cadastro", "Erro ao salvar no Firestore: ${e.message}")
+                                Toast.makeText(contexto, "Conta criada, mas houve um erro ao salvar seus dados", Toast.LENGTH_LONG).show()
+                            }
+                    }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("Cadastro", "Erro ao criar usuário: ${e.message}")
-                Toast.makeText(contexto, "Falha ao criar conta: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+                .addOnFailureListener { e ->
+                    Log.e("Cadastro", "Erro ao criar usuário: ${e.message}")
+                    Toast.makeText(contexto, "Falha ao criar conta: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+        } catch (e: Exception) {
+            Log.e("Criptografia", "Erro ao criptografar senha: ${e.message}")
+            Toast.makeText(contexto, "Erro interno ao processar os dados", Toast.LENGTH_LONG).show()
+        }
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
     var nome by remember { mutableStateOf("") }
@@ -144,7 +144,6 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -162,7 +161,6 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
 
         Text(
             text = "Bem-vindo ao SuperID!",
@@ -212,7 +210,7 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
             label = { Text("Senha Mestre") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            visualTransformation = if (mostrarSenha) PasswordVisualTransformation() else PasswordVisualTransformation(),
+            visualTransformation = if (!mostrarSenha) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             trailingIcon = {
@@ -230,7 +228,7 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
             label = { Text("Confirmar Senha Mestre") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            visualTransformation = if (mostrarConfirmarSenha) PasswordVisualTransformation() else PasswordVisualTransformation(),
+            visualTransformation = if (!mostrarConfirmarSenha) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             trailingIcon = {
@@ -241,7 +239,6 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -258,7 +255,6 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-
 
         Button(
             onClick = {
@@ -283,7 +279,6 @@ fun TelaDeCadastro(onSignUp: (String, String, String) -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         TextButton(onClick = { /* Implementar navegação para login */ }) {
             Text("Já tem uma conta? Faça login")
