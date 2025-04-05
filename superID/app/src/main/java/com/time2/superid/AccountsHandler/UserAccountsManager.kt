@@ -36,7 +36,19 @@ class UserAccountsManager
         auth.createUserWithEmailAndPassword(email, encryptedPass)
             .addOnSuccessListener {
                 // Getting UID and IMEI
-                    authResult -> val userID = authResult.user?.uid.toString()
+                authResult -> val userID = authResult.user?.uid.toString()
+
+                // Sending email verification
+                authResult.user?.sendEmailVerification()
+                    ?.addOnSuccessListener {
+                        Log.d("EmailVerification", "Verification email sent.")
+                        showShortToast(context, "Waiting for email Validation")
+                    }
+                    ?.addOnFailureListener { e ->
+                        Log.e("EmailVerification", "Failed to send verification email", e)
+                        showShortToast(context, "Couldn`t validate email.")
+                    }
+
                 val imei = getDeviceID(context)
                 val date = com.google.firebase.Timestamp.now()
 
