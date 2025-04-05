@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,7 @@ class LoginActivity : ComponentActivity() {
         // Verifica se o usuário já está logado
         if (auth.currentUser != null) {
             Log.i(TAG, "Usuário já logado: ${auth.currentUser?.uid}")
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, HomeActivity::class.java))
             finish()
             return
         }
@@ -55,7 +56,7 @@ class LoginActivity : ComponentActivity() {
                     val user = task.result?.user
                     if (user != null) {
                         Log.i(TAG, "Login realizado. UID: ${user.uid}")
-                        startActivity(Intent(this, MainActivity::class.java))
+                        startActivity(Intent(this, HomeActivity::class.java))
                         finish()
                     } else {
                         Log.e(TAG, "Login bem-sucedido, mas task.result.user é nulo")
@@ -87,6 +88,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -145,6 +147,16 @@ fun LoginScreen(
             } else {
                 Text("Login")
             }
+        }
+
+        //Botão que vai para a activity de SignUp
+        Button(
+            onClick = {
+                context.startActivity(Intent(context, SignUpActivity::class.java))
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Cadastrar-se")
         }
 
         // Exibe mensagem de erro, se houver
