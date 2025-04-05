@@ -1,50 +1,47 @@
 package com.time2.superid
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.time2.superid.ui.theme.SuperIDTheme
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.utils.showShortToast
+import com.time2.superid.AccountsHandler.UserAccountsManager
+
 import android.provider.Settings
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 
 class SignUpActivity : ComponentActivity()
 {
-    private val auth : FirebaseAuth = Firebase.auth
-    private val TAG  : String = "SignUp Activity"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        // Check if user is logged in
-        if(auth.currentUser != null)
-        {
-            Log.i(TAG, "User already logged in")
-            showShortToast(this, "User already logged in")
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
 
         setContent{
             SuperIDTheme {
@@ -54,101 +51,76 @@ class SignUpActivity : ComponentActivity()
     }
 }
 
-fun createAccount(email : String, password : String, name : String, context: Context)
-{
-    val auth = Firebase.auth
-    auth.createUserWithEmailAndPassword(email, password)
-        .addOnSuccessListener { authResult ->
-            // Getting UID
-            val userID = authResult.user?.uid.toString()
-            val imei : String = getDeviceIdentifier(context)
-
-            Log.w("CreateAccount", "Account Created")
-            showShortToast(context,"Welcome to superID")
-            saveUserToFirestore(email, name, password,  userID, imei, context)
-
-            // Redirecting user to another activity
-            context.startActivity(Intent(context, HomeActivity::class.java))
-        }
-        .addOnFailureListener {
-            e -> Log.e("CreateAccount", "Failed To create account")
-            showShortToast(context,"Check Email or Password")
-        }
-}
-
-fun getDeviceIdentifier(context: Context) : String
-{
-    // Return device IMEI
-    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-}
-
-fun saveUserToFirestore(
-    email: String,
-    name: String,
-    password: String,
-    uid : String,
-    imei : String,
-    context: Context)
-{
-    // Creating Document
-    val userData = hashMapOf(
-        "EMAIL" to email,
-        "NAME" to name,
-        "PASSWORD " to password,
-        "UID" to uid,
-        "IMEI" to imei
-    )
-
-    // Adding user to Firestore
-    val db = Firebase.firestore
-    db.collection("AccountsManager").document().set(userData)
-        .addOnSuccessListener { Log.d("Firestore", "User data successfully written!") }
-        .addOnFailureListener { e ->
-            Log.w("Firestore", "Error writing document", e)
-            showShortToast(context, "Error saving user data")
-        }
-
-}
 
 @Composable
 fun SignUpView( modifier: Modifier = Modifier)
 {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var useTerms by remember { mutableStateOf(false) }
+    var showPassword by  remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
+        modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text(
-            "SuperID"
+        // Super ID icon
+        Image(
+            painter = painterResource(id = R.mipmap.ic_launcher_superid),
+            contentDescription = "SuperID logo",
+            contentScale = ContentScale.Crop
         )
 
+
+        Spacer(modifier.height(24.dp))
+
+        // Welcome Title
+        Text(
+            text = "Welcome to SuperID!",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        Text(
+            text = "Login without passwords",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Forms
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -157,34 +129,86 @@ fun SignUpView( modifier: Modifier = Modifier)
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            shape = RoundedCornerShape(12.dp),
+            visualTransformation = if (!showPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+            trailingIcon = {
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Text(if (showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            visualTransformation = if (!showPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+            trailingIcon = {
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Text(if (showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Checkbox(
+                checked = useTerms,
+                onCheckedChange = { useTerms = it }
+            )
+            Text(
+                "I accept the Terms of Use and Privacy Policy",
+                fontSize = 14.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = {
-                if( email.isBlank() || name.isBlank() || password.isBlank() ){
+                if( email.isBlank() || name.isBlank() || password.isBlank() || confirmPassword.isBlank() ){
                     showShortToast(context, "Please fill in all the fields!")
+                }else if(!useTerms){
+                    showShortToast(context, "Accept Terms of Use")
+                }else if(password != confirmPassword){
+                    showShortToast(context,"Passwords do not match")
+                }else if(password.length < 6){
+                    showShortToast(context, "password must have at least 6 characters")
                 }else{
-                    isLoading = true
-                    createAccount(email, name, password, context)
+                    val userAccountsManager = UserAccountsManager()
+                    userAccountsManager.createUserAccount(email, password, name, context)
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Sign Up")
-            }
+            Text(
+                "Sign Up",
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = {
+            context.startActivity(Intent(context, HomeActivity::class.java))
+        }) {
+            Text("Já tem uma conta? Faça login")
         }
 
     }
