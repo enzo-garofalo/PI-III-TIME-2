@@ -84,7 +84,7 @@ fun SignUpView( modifier: Modifier = Modifier)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
+        // Subtitle
         Text(
             text = "Login without passwords",
             fontSize = 16.sp,
