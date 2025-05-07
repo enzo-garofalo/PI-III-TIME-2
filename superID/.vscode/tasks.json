@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Emulator and Run App",
+      "type": "shell",
+      "command": "chmod +x ./gradlew && ./gradlew assembleDebug && ./gradlew installDebug & ${env:ANDROID_HOME}/emulator/emulator -avd Medium_Phone",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
