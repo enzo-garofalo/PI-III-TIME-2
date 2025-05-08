@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.superid.AccountsHandler.ForgetPasswordActivity
+import com.time2.superid.AccountsHandler.SignUpActivity
+import com.time2.superid.utils.redirectIfLogged
 
 class LoginActivity : ComponentActivity() {
 
@@ -29,13 +32,7 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Verifica se o usuário já está logado
-        if (auth.currentUser != null) {
-            Log.i(TAG, "Usuário já logado: ${auth.currentUser?.uid}")
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-            return
-        }
+        if (redirectIfLogged(this, TAG)) return
 
         setContent {
             SuperIDTheme {
@@ -97,11 +94,16 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Campo de e-mail
+        // Campos de e-mail e senha (mantidos iguais)
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { input ->
+                // Removendo espaços
+                email = input.replace(" ", "").lowercase()
+            },
             label = { Text("E-mail") },
+            // Impede quebra de linhas
+            singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
@@ -109,7 +111,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de senha
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -122,7 +123,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botão de login
+        // Botão de login (mantido igual)
         Button(
             onClick = {
                 if (email.isNotBlank() && password.isNotBlank()) {
@@ -149,17 +150,37 @@ fun LoginScreen(
             }
         }
 
-        //Botão que vai para a activity de SignUp
-        Button(
+        // Botão "Esqueceu sua senha?"
+        TextButton(
+            onClick = {
+                context.startActivity(Intent(context, ForgetPasswordActivity::class.java))
+            },
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Text(
+                text = "Esqueceu sua senha?",
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        // Botão "Cadastre-se"
+        TextButton(
             onClick = {
                 context.startActivity(Intent(context, SignUpActivity::class.java))
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(top = 8.dp)
         ) {
-            Text("Cadastrar-se")
+            Text(
+                text = "Não tem uma conta?",
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = "Cadastre-se",
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
-        // Exibe mensagem de erro, se houver
+        // Mensagem de erro (mantida igual)
         errorMessage?.let {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
