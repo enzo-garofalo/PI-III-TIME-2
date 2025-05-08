@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.superid.utils.redirectIfLogged
 
 class LoginActivity : ComponentActivity() {
 
@@ -29,13 +30,7 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Verifica se o usuário já está logado
-        if (auth.currentUser != null) {
-            Log.i(TAG, "Usuário já logado: ${auth.currentUser?.uid}")
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-            return
-        }
+        if (redirectIfLogged(this, TAG)) return
 
         setContent {
             SuperIDTheme {
@@ -100,8 +95,13 @@ fun LoginScreen(
         // Campos de e-mail e senha (mantidos iguais)
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { input ->
+                // Removendo espaços
+                email = input.replace(" ", "").lowercase()
+            },
             label = { Text("E-mail") },
+            // Impede quebra de linhas
+            singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
@@ -157,6 +157,23 @@ fun LoginScreen(
         ) {
             Text(
                 text = "Esqueceu sua senha?",
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        // Botão "Cadastre-se"
+        TextButton(
+            onClick = {
+                context.startActivity(Intent(context, SignUpActivity::class.java))
+            },
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Text(
+                text = "Não tem uma conta?",
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = "Cadastre-se",
                 color = MaterialTheme.colorScheme.primary
             )
         }
