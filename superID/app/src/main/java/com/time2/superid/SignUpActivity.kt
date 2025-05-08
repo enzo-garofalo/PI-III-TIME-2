@@ -27,14 +27,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.utils.showShortToast
 import com.time2.superid.AccountsHandler.UserAccountsManager
-
+import com.time2.superid.utils.redirectIfLogged
 
 
 class SignUpActivity : ComponentActivity()
 {
+
+    private val TAG : String = "SIGN_UP"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if (redirectIfLogged(this, TAG)) return
 
         setContent{
             SuperIDTheme {
