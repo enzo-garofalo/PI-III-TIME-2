@@ -1,4 +1,4 @@
-package com.time2.superid
+package com.time2.superid.AccountsHandler
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.superid.HomeActivity
+import com.time2.superid.LoginActivity
+import com.time2.superid.SuperIDTheme
 
 class ForgetPasswordActivity : ComponentActivity() {
 

@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.superid.AccountsHandler.ForgetPasswordActivity
+import com.time2.superid.AccountsHandler.SignUpActivity
 import com.time2.superid.utils.redirectIfLogged
 
 class LoginActivity : ComponentActivity() {

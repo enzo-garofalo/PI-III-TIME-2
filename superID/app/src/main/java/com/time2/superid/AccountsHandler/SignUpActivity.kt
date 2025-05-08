@@ -1,4 +1,4 @@
-package com.time2.superid
+package com.time2.superid.AccountsHandler
 
 import android.content.Intent
 import android.os.Bundle
@@ -26,7 +26,8 @@ import com.time2.superid.ui.theme.SuperIDTheme
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.utils.showShortToast
-import com.time2.superid.AccountsHandler.UserAccountsManager
+import com.time2.superid.LoginActivity
+import com.time2.superid.R
 import com.time2.superid.utils.redirectIfLogged
 
 
@@ -204,7 +205,7 @@ fun SignUpView( modifier: Modifier = Modifier)
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = {
-            context.startActivity(Intent(context, HomeActivity::class.java))
+            context.startActivity(Intent(context, LoginActivity::class.java))
         }) {
             Text("Já tem uma conta? Faça login")
         }

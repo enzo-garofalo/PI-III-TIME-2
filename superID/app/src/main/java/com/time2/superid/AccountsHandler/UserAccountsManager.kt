@@ -7,7 +7,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.time2.superid.EmailValidationActivity
 import com.time2.superid.utils.getDeviceID
 import com.time2.superid.utils.showShortToast
 

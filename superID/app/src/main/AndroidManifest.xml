@@ -25,7 +25,7 @@
 
         <!-- Activity de cadastro -->
         <activity
-            android:name=".SignUpActivity"
+            android:name=".AccountsHandler.SignUpActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID">
@@ -37,7 +37,7 @@
 
         <!-- Activity de recuperação de senha -->
         <activity
-            android:name=".ForgetPasswordActivity"
+            android:name=".AccountsHandler.ForgetPasswordActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"
@@ -52,7 +52,7 @@
 
         <!-- Activity de validação de email -->
         <activity
-            android:name=".EmailValidationActivity"
+            android:name=".AccountsHandler.EmailValidationActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID" />
