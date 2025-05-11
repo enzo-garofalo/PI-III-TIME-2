@@ -13,7 +13,6 @@ import com.time2.superid.utils.showShortToast
 data class UserAccount(
     val email: String,
     val name: String,
-    val password: String,
     val registerDate: Timestamp,
     val hasEmailVerified: Boolean = false,
     val uid: String,
@@ -37,7 +36,6 @@ class UserAccountsManager {
                 val userAccount = UserAccount(
                     email = email,
                     name = name,
-                    password = password,
                     registerDate = date,
                     uid = userID,
                     imei = imei
@@ -68,6 +66,17 @@ class UserAccountsManager {
                 callback(false)
             }
     }
+
+//    fun getUserData(uid: String) : UserAccount{
+//        db.collection("AccountsManager")
+//            .whereEqualTo("uid", uid)
+//            .get()
+//            .addOnSuccessListener {querySnapshot ->
+//                if (!querySnapshot.isEmpty) {
+//                    return querySnapshot.documents.first().reference
+//                }
+//            }
+//    }
 
     private fun updateEmailVerificationStatus(uid: String) {
         db.collection("AccountsManager")
