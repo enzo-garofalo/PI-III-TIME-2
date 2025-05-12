@@ -20,7 +20,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.superid.HomeActivity
 import com.time2.superid.LoginActivity
-import com.time2.superid.SuperIDTheme
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class ForgetPasswordActivity : ComponentActivity() {
 

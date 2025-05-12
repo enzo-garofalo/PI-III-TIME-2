@@ -78,7 +78,7 @@ fun elementButton(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = element.description!!,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.titleSmall,
                         color = Color.Gray
                     )
                 }

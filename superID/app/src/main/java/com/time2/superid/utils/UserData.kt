@@ -8,8 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.time2.superid.AccountsHandler.UserAccount
 import com.time2.superid.HomeActivity
+import kotlinx.coroutines.tasks.await
 
 fun getDeviceID(context: Context) : String
 {
@@ -17,8 +20,24 @@ fun getDeviceID(context: Context) : String
     return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 }
 
-fun redirectIfLogged(activity: ComponentActivity, TAG: String): Boolean {
+//suspend fun getUserData(uid: String): UserAccount? {
+//    val db = FirebaseFirestore.getInstance()
+//    return try {
+//        val snapshot = db.collection("AccountsManager")
+//            .whereEqualTo("uid", uid)
+//            .get()
+//            .await()
+//        if (!snapshot.isEmpty) {
+//            snapshot.documents.first().toObject(UserAccount::class.java)
+//        } else null
+//    } catch (e: Exception) {
+//        Log.e("Firestore", "Failed to get user data", e)
+//        null
+//    }
+//}
 
+
+fun redirectIfLogged(activity: ComponentActivity, TAG: String): Boolean {
     val auth = Firebase.auth
 
     if (auth.currentUser != null) {

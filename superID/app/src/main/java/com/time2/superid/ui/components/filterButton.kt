@@ -28,6 +28,9 @@ fun FilterButton(
         shape = RoundedCornerShape(12.dp),
         elevation = ButtonDefaults.buttonElevation(0.dp)
     ){
-        Text(text)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleSmall
+        )
     }
 }

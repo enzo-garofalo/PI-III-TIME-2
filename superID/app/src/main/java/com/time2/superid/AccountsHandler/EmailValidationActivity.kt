@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.time2.superid.HomeActivity
-import com.time2.superid.SuperIDTheme
+import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.showShortToast
 
 class EmailValidationActivity : ComponentActivity()
