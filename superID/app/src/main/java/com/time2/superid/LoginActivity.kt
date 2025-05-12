@@ -38,6 +38,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 
 class LoginActivity : ComponentActivity() {
@@ -200,6 +201,9 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Campo de Senha
+
+            var passwordVisible by remember { mutableStateOf(false) }
+
             OutlinedTextField(
                 value = password,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -227,14 +231,27 @@ fun LoginScreen(
                         )
                     }
                 },
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
                     .height(56.dp)
                     .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
-                enabled = !isLoading
+                enabled = !isLoading,
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.fluent_eye),
+                            contentDescription = "Mostrar/Esconder senha",
+                            modifier = Modifier
+                                .size(30.dp) // Ajuste o tamanho do ícone, se necessário
+                                .padding(4.dp)
+                                .offset(0.dp, -5.dp)
+                        )
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -375,3 +392,4 @@ fun LoginScreen(
         }
     }
 }
+
