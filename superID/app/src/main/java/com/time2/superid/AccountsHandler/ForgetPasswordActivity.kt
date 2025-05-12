@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.time2.superid.LoginActivity
-import com.time2.superid.SuperIDTheme
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class ForgetPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

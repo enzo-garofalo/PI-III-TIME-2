@@ -22,11 +22,11 @@ import com.time2.learningui_ux.components.buildPasswordManager
 import com.time2.learningui_ux.components.buildTopAppBar
 import com.time2.learningui_ux.components.showCategoryElements
 import com.time2.learningui_ux.components.showPasswordList
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class HomeActivity : ComponentActivity() {
 
     private val auth: FirebaseAuth = Firebase.auth
-    private val db :
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +39,7 @@ class HomeActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         buildTopAppBar(
-                            userName = "",
+                            userName = "JoãoGabriel",
                             showBackClick =  false,
                             onBackClick   =  { /*TODO*/},
                             onLogoutClick =  { /*TODO*/},

@@ -67,16 +67,23 @@ class UserAccountsManager {
             }
     }
 
-//    fun getUserData(uid: String) : UserAccount{
-//        db.collection("AccountsManager")
-//            .whereEqualTo("uid", uid)
-//            .get()
-//            .addOnSuccessListener {querySnapshot ->
-//                if (!querySnapshot.isEmpty) {
-//                    return querySnapshot.documents.first().reference
-//                }
-//            }
-//    }
+    fun getUserData(uid: String) : UserAccount?{
+        var user : UserAccount? = null
+        db.collection("AccountsManager")
+            .whereEqualTo("uid", uid)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents.first()
+                    var user = document.toObject(UserAccount::class.java)
+                }
+            }
+            .addOnFailureListener {
+                Log.e("GetUserData", "Erro ao buscar usuário", it)
+
+            }
+        return user
+    }
 
     private fun updateEmailVerificationStatus(uid: String) {
         db.collection("AccountsManager")
