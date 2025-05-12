@@ -70,7 +70,7 @@ fun SignUpView( modifier: Modifier = Modifier)
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        // Super ID icon
+        // SuperID icon
         Image(
             painter = painterResource(id = R.mipmap.ic_launcher_superid),
             contentDescription = "SuperID logo",
