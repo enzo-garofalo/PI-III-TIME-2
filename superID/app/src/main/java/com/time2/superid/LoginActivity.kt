@@ -116,7 +116,6 @@ fun LoginScreen(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
 
-        // Espaçamento igual entre imagem e texto/campo de e-mail
         Spacer(modifier = Modifier.height(20.dp))
 
         // Imagem do app
@@ -168,7 +167,7 @@ fun LoginScreen(
                 ),
                 onValueChange = { input ->
                     // Removendo espaços
-                    email = input.replace(" ", "").lowercase()
+                    email = input.replace(" ", "")
                 },
                 singleLine = true,
                 label = {
