@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.ui.theme.SuperIDTheme
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.utils.showShortToast
 import com.time2.superid.LoginActivity
@@ -50,6 +56,16 @@ class SignUpActivity : ComponentActivity()
     }
 }
 
+@Composable
+fun SuperIDTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF4500C9),
+            onPrimary = Color.White
+        ),
+        content = content
+    )
+}
 
 @Composable
 fun SignUpView( modifier: Modifier = Modifier)
@@ -58,84 +74,189 @@ fun SignUpView( modifier: Modifier = Modifier)
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var useTerms by remember { mutableStateOf(false) }
-    var showPassword by  remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
-
+    var isLoading by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
-        modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        // Super ID icon
+            .background(color = Color(0xFFFFFFFF))
+            .padding(start = 22.dp, top = 30.dp, end = 22.dp, bottom = 30.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Imagem do app
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher_superid),
-            contentDescription = "SuperID logo",
-            contentScale = ContentScale.Crop
+            painter = painterResource(id = R.drawable.ic_launcher),
+            contentDescription = "image description",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .width(100.dp)
+                .height(100.dp)
+                .padding(top = 0.dp, start = 0.dp)
         )
 
+        // Empurra os elementos para baixo
+        Spacer(modifier = Modifier.weight(1f))
 
-        Spacer(modifier.height(24.dp))
+        // Centraliza os elementos principais
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
 
-        // Welcome Title
-        Text(
-            text = "Welcome to SuperID!",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Subtitle
-        Text(
-            text = "Login without passwords",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            // Texto de Faça seu cadastro
+            Text(
+                text = "Faça seu cadastro no SuperID, de graça!",
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    lineHeight = 39.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(700),
+                    color = Color(0xFF1E232C),
+                    textAlign = TextAlign.Left,
+                ),
+                modifier = Modifier
+                    .width(280.dp)
+                    .height(117.dp)
+            )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Forms
+        // Campo de Nome
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent,
+                errorBorderColor = Color.Transparent
+            ),
+            singleLine = true,
+            label = {
+                Box(modifier = Modifier
+                    .fillMaxHeight()
+                    .offset(0.dp, -5.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Nome",
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            lineHeight = 18.75.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF8391A1)
+                        )
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(331.dp)
+                .height(66.dp)
+                .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
+            enabled = !isLoading
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo de e-mail
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent,
+                errorBorderColor = Color.Transparent
+            ),
+            onValueChange = { input ->
+                email = input.replace(" ", "")
+            },
+            singleLine = true,
+            label = {
+                Box(modifier = Modifier
+                    .fillMaxHeight()
+                    .offset(0.dp, -5.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "E-mail",
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            lineHeight = 18.75.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF8391A1)
+                        )
+                    )
+                }
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(331.dp)
+                .height(66.dp)
+                .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
+            enabled = !isLoading
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo de Senha
         OutlinedTextField(
             value = password,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent,
+                errorBorderColor = Color.Transparent
+            ),
             onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            visualTransformation = if (!showPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            label = {
+                Box(modifier = Modifier
+                    .fillMaxHeight()
+                    .offset(0.dp, -5.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Senha",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            lineHeight = 18.75.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF8391A1),
+                        )
+                    )
+                }
+            },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(331.dp)
+                .height(66.dp)
+                .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
+            enabled = !isLoading,
             trailingIcon = {
-                IconButton(onClick = { showPassword = !showPassword }) {
-                    Text(if (showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
+                IconButton(onClick = { passwordVisible = !passwordVisible },
+                    modifier = Modifier.offset(0.dp, -5.dp) ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.fluent_eye),
+                        contentDescription = "Mostrar/Esconder senha",
+                        modifier = Modifier
+                            .size(30.dp) // Ajuste o tamanho do ícone, se necessário
+                            .padding(4.dp)
+                    )
                 }
             }
         )
@@ -145,18 +266,53 @@ fun SignUpView( modifier: Modifier = Modifier)
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            visualTransformation = if (!showPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent,
+                errorBorderColor = Color.Transparent
+            ),
+            label = {
+                Box(modifier = Modifier
+                    .fillMaxHeight()
+                    .offset(0.dp, -5.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Confirme sua senha",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            lineHeight = 18.75.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF8391A1),
+                        )
+                    )
+                }
+            },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(331.dp)
+                .height(66.dp)
+                .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
+            enabled = !isLoading,
             trailingIcon = {
-                IconButton(onClick = { showPassword = !showPassword }) {
-                    Text(if (showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
+                IconButton(onClick = { passwordVisible = !passwordVisible },
+                    modifier = Modifier.offset(0.dp, -5.dp) ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.fluent_eye),
+                        contentDescription = "Mostrar/Esconder senha",
+                        modifier = Modifier
+                            .size(30.dp) // Ajuste o tamanho do ícone, se necessário
+                            .padding(4.dp)
+                    )
                 }
             }
         )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -164,13 +320,39 @@ fun SignUpView( modifier: Modifier = Modifier)
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Checkbox(
-                checked = useTerms,
-                onCheckedChange = { useTerms = it }
+
+
+            IconButton(onClick = { useTerms = !useTerms }) { // Inverte o estado ao clicar
+                Image(
+                    painter = painterResource(id = if (useTerms) R.drawable.i_agree_with_terms else R.drawable.i_dont_agree_with_terms),
+                    contentDescription = if (useTerms) "Aceito os termos de uso" else "Nao aceito os termos de uso",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(4.dp)
+                )
+            }
+            Text(
+                text = "Eu concordo com os ",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(600),
+                    color = Color(0xFF6A707C),
+                )
             )
             Text(
-                "I accept the Terms of Use and Privacy Policy",
-                fontSize = 14.sp
+                text = " termos de uso",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(600),
+                    color = Color(0xFF4500C9),
+                    textAlign = TextAlign.Right,
+                )/*,
+                modifier = Modifier
+                    .clickable {
+                        context.startActivity(Intent(context, LoginActivity::class.java))
+                    }*/
             )
         }
 
@@ -191,23 +373,82 @@ fun SignUpView( modifier: Modifier = Modifier)
                     userAccountsManager.createUserAccount(email, password, name, context)
                 }
             },
-            modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(12.dp)
+                .width(331.dp)
+                .height(66.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF4500C9),
+                disabledContainerColor = Color(0xFF4500C9).copy(alpha = 0.5f),
+                contentColor = Color.White,
+                disabledContentColor = Color.White.copy(alpha = 0.5f)
+            ),
+            shape = RoundedCornerShape(size = 80.dp),
+            enabled = !isLoading
         ) {
-            Text(
-                "Sign Up",
-                fontWeight = FontWeight.Bold
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White
+                )
+            } else {
+                Text(
+                    text = "Cadastrar-se",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontFamily = FontFamily(Font(R.font.urbanist)),
+                        fontWeight = FontWeight(600),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                    )
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Empurrar a Row inferior para o fim da tela
+        Spacer(modifier = Modifier.weight(1f))
 
-        TextButton(onClick = {
-            context.startActivity(Intent(context, LoginActivity::class.java))
-        }) {
-            Text("Já tem uma conta? Faça login")
+        // Seção inferior
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(21.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Já tem uma conta?",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    lineHeight = 21.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF1E232C),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.15.sp
+                ),
+                modifier = Modifier
+                    .width(142.dp)
+                    .height(21.dp)
+            )
+
+            //Botão que vai para a activity de Login
+            Text(
+                text = "Entrar",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    lineHeight = 21.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(700),
+                    color = Color(0xFF4500C9),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.15.sp
+                ),
+                modifier = Modifier
+                    .clickable {
+                        context.startActivity(Intent(context, LoginActivity::class.java))
+                    }
+            )
         }
 
     }
