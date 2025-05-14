@@ -16,7 +16,7 @@ fun FilterButton(
     onClick: () -> Unit
 ) {
     // Essa cores estão  hardcoded (arrumar)
-    val backgroundColor = if(selected) MaterialTheme.colorScheme.primary else Color(0xFFE0E0E0)
+    val backgroundColor = if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
     val contentColor = if(selected) Color.White else Color.Gray
 
     Button(
@@ -30,7 +30,7 @@ fun FilterButton(
     ){
         Text(
             text = text,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }

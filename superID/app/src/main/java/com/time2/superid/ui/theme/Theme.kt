@@ -41,7 +41,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Black,
 
     tertiary = GreyEnabled,
-    onTertiary = White,
+    onTertiary = GreyBackground,
 
     background = Background,
     onBackground = Black,

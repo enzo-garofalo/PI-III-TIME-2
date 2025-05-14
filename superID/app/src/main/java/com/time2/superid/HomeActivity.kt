@@ -34,7 +34,6 @@ class HomeActivity : ComponentActivity() {
         setContent {
             SuperIDTheme {
                 var showModal by remember { mutableStateOf(false) }
-                val sheetState = rememberModalBottomSheetState()
 
                 Scaffold(
                     topBar = {
@@ -74,8 +73,7 @@ class HomeActivity : ComponentActivity() {
 
                     if (showModal) {
                         buildBottomModal(
-                            onDismiss = { showModal = false },
-                            sheetState = sheetState
+                            onDismiss = { showModal = false }
                         )
                     }
                 }

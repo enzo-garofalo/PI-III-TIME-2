@@ -1,6 +1,7 @@
 package com.time2.learningui_ux.components
 
 import android.R
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,53 +24,83 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.time2.superid.ui.components.emailTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 fun buildBottomModal(
     onDismiss : () -> Unit,
-    sheetState: SheetState
 ) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
+    var currentModal by remember { mutableStateOf("menu") }
+
+
+
+    // Change the content if any button is pressed
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Cadastre uma nova senha ou categoria",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+        when(currentModal){
+            "menu" -> buildMenuModal(
+                onRegisterCategoryClick = {
+                    currentModal = "category"
+                },
+                onRegisterPasswordClick = {
+                    currentModal = "password"
+                }
             )
-            Text(
-                text = "Simples e rápido",
-                color = Color.Gray,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
-            )
-
-            Button(
-                onClick = { /* Ação nova senha */ },
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Registrar nova senha")
-            }
-
-            Text("ou", modifier = Modifier.padding(vertical = 16.dp))
-
-            Button(
-                onClick = { /* Ação nova categoria */ },
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Registrar nova categoria")
-            }
+            "password" -> { /*TODO*/}
+            "category" -> { /*TODO*/}
         }
+    }
+}
+
+@Composable
+fun buildMenuModal(
+    onRegisterPasswordClick : () -> Unit,
+    onRegisterCategoryClick : () -> Unit
+){
+    Column(
+        Modifier
+            .background(color = Color.White)
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        emailTextField(false)
+//        Text(
+//            text = "Cadastre uma nova senha ou categoria",
+//            fontWeight = FontWeight.Bold,
+//            fontSize = 20.sp
+//        )
+//        Text(
+//            text = "Simples e rápido",
+//            color = Color.Gray,
+//            fontSize = 14.sp,
+//            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+//        )
+//
+//        Button(
+//            onClick = { onRegisterPasswordClick },
+//            shape = RoundedCornerShape(50),
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Registrar nova senha")
+//        }
+//
+//        Text("ou", modifier = Modifier.padding(vertical = 16.dp))
+//
+//        Button(
+//            onClick = { onRegisterCategoryClick },
+//            shape = RoundedCornerShape(50),
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Registrar nova categoria")
+//        }
     }
 }
