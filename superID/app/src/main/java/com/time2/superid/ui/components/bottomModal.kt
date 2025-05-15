@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.time2.superid.ui.components.CustomTextField
 import com.time2.superid.ui.components.emailTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,10 +70,63 @@ fun buildMenuModal(
         Modifier
             .background(color = Color.White)
             .fillMaxWidth()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp)
     ) {
-        emailTextField(false)
+        var login by remember { mutableStateOf("") }
+        var nome by remember { mutableStateOf("") }
+        var senha by remember { mutableStateOf("") }
+        var categoria by remember { mutableStateOf("") }
+        var descricao by remember { mutableStateOf("") }
+
+        Text(
+            text = "Cadastre sua senha",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
+        CustomTextField(
+            label = "Nome da aplicação",
+            isSingleLine = true,
+            value = nome,
+            onValueChange = { nome = it}
+        )
+
+        CustomTextField(
+            label = "login",
+            isSingleLine = true,
+            value = login,
+            onValueChange = { login = it}
+        )
+
+        CustomTextField(
+            label = "Senha de acesso",
+            isSingleLine = true,
+            value = senha,
+            onValueChange = { senha = it}
+        )
+
+        CustomTextField(
+            label = "Categoria",
+            isSingleLine = true,
+            value = categoria,
+            onValueChange = { categoria = it}
+        )
+
+        CustomTextField(
+            label = "Descrição",
+            isSingleLine = false,
+            value = descricao,
+            onValueChange = { descricao = it}
+        )
+
+        Button(
+            onClick = { onRegisterPasswordClick },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Registrar nova senha")
+        }
+
 //        Text(
 //            text = "Cadastre uma nova senha ou categoria",
 //            fontWeight = FontWeight.Bold,
