@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.utils.showShortToast
 import com.time2.superid.LoginActivity
 import com.time2.superid.R
+import com.time2.superid.screens.TermsOfUseActivity
 import com.time2.superid.utils.redirectIfLogged
 
 
@@ -348,11 +349,11 @@ fun SignUpView( modifier: Modifier = Modifier)
                     fontWeight = FontWeight(600),
                     color = Color(0xFF4500C9),
                     textAlign = TextAlign.Right,
-                )/*,
+                ),
                 modifier = Modifier
                     .clickable {
-                        context.startActivity(Intent(context, LoginActivity::class.java))
-                    }*/
+                        context.startActivity(Intent(context, TermsOfUseActivity::class.java))
+                    }
             )
         }
 
