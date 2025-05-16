@@ -11,17 +11,18 @@ import com.time2.superid.utils.getDeviceID
 import com.time2.superid.utils.showShortToast
 
 data class UserAccount(
-    val email: String,
-    val name: String,
-    val registerDate: Timestamp,
+    val email: String = "",
+    val name: String = "",
+    val registerDate: Timestamp = Timestamp.now(),
     val hasEmailVerified: Boolean = false,
-    val uid: String,
-    val imei: String
+    val uid: String = "",
+    val imei: String = ""
 )
 
 class UserAccountsManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val TAG = "UserAccountsManager"
 
     fun createUserAccount(email: String, password: String, name: String, context: Context) {
         auth.createUserWithEmailAndPassword(email, password)
@@ -67,22 +68,53 @@ class UserAccountsManager {
             }
     }
 
-    fun getUserData(uid: String) : UserAccount?{
-        var user : UserAccount? = null
+    /**
+     * Get user data synchronously - Note: This function is problematic as it doesn't wait for the async call
+     * Use getUserProfileName instead for UI elements that need to display user data
+     */
+    fun getUserData(uid: String): UserAccount? {
+        var user: UserAccount? = null
         db.collection("AccountsManager")
             .whereEqualTo("uid", uid)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     val document = querySnapshot.documents.first()
-                    var user = document.toObject(UserAccount::class.java)
+                    // Fixed: assignment was inside the variable declaration
+                    user = document.toObject(UserAccount::class.java)
                 }
             }
             .addOnFailureListener {
                 Log.e("GetUserData", "Erro ao buscar usuário", it)
-
             }
         return user
+    }
+
+    /**
+     * Get user profile name asynchronously with callback
+     * This function returns the user's name via a callback when the Firestore query completes
+     */
+    fun getUserProfileName(uid: String, callback: (String) -> Unit) {
+        db.collection("AccountsManager")
+            .whereEqualTo("uid", uid)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents.first()
+                    val userAccount = document.toObject(UserAccount::class.java)
+                    // Return the name via callback
+                    userAccount?.let {
+                        callback(it.name)
+                    } ?: callback("")
+                } else {
+                    Log.w(TAG, "No user found with uid: $uid")
+                    callback("")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching user data", e)
+                callback("")
+            }
     }
 
     private fun updateEmailVerificationStatus(uid: String) {
