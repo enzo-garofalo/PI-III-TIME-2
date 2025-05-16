@@ -40,6 +40,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class LoginActivity : ComponentActivity() {
 
@@ -49,6 +51,18 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Controla a visibilidade das barras do sistema
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            // Oculta a navigation bar (barra de menu)
+            hide(WindowInsetsCompat.Type.navigationBars())
+            // Garante que a status bar (barra de notificação) permaneça visível
+            show(WindowInsetsCompat.Type.statusBars())
+            // Define o comportamento para que a navigation bar não reapareça com gestos
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        window.statusBarColor = android.graphics.Color.BLACK
 
         if (redirectIfLogged(this, TAG)) return
 
@@ -115,9 +129,9 @@ fun LoginScreen(
             .background(color = Color(0xFFFFFFFF))
             .padding(start = 22.dp, top = 30.dp, end = 22.dp, bottom = 30.dp),
         verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.Start
     ) {
 
-        Spacer(modifier = Modifier.height(20.dp))
 
         // Imagem do app
         Image(
@@ -127,35 +141,34 @@ fun LoginScreen(
             modifier = Modifier
                 .width(100.dp)
                 .height(100.dp)
-                .padding(top = 0.dp, start = 0.dp)
         )
 
         // Empurra os elementos para baixo
         Spacer(modifier = Modifier.weight(1f))
 
-        // Centraliza os elementos principais
+        // Texto de boas vindas
+        Text(
+            text = "Bem vindo de volta, faça o login para continuar",
+            style = TextStyle(
+                fontSize = 30.sp,
+                lineHeight = 39.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist)),
+                fontWeight = FontWeight(700),
+                color = Color(0xFF1E232C),
+                textAlign = TextAlign.Left,
+            ),
+            modifier = Modifier
+                .width(280.dp)
+                .height(117.dp)
+        )
+
+
         Column(
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-
-
-            // Texto de boas vindas
-            Text(
-                text = "Bem vindo de volta, faça o login para continuar",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                    lineHeight = 39.sp,
-                    fontFamily = FontFamily(Font(R.font.urbanist)),
-                    fontWeight = FontWeight(700),
-                    color = Color(0xFF1E232C),
-                    textAlign = TextAlign.Left,
-                ),
-                modifier = Modifier
-                    .offset(0.dp, -100.dp)
-                    .width(280.dp)
-                    .height(117.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Campo de e-mail
             OutlinedTextField(
@@ -167,7 +180,6 @@ fun LoginScreen(
                     errorBorderColor = Color.Transparent
                 ),
                 onValueChange = { input ->
-                    // Removendo espaços
                     email = input.replace(" ", "")
                 },
                 singleLine = true,
@@ -179,26 +191,29 @@ fun LoginScreen(
                     ) {
                         Text(
                             text = "E-mail",
-                            textAlign = TextAlign.Center,
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
                                 fontFamily = FontFamily(Font(R.font.urbanist)),
                                 fontWeight = FontWeight(500),
-                                color = Color(0xFF8391A1)
+                                color = Color(0xFF8391A1),
                             )
                         )
                     }
                 },
+                textStyle = TextStyle(
+                    color = Color(0xFF1E232C)
+                ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp)
+                    .height(60.dp)
                     .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
                 enabled = !isLoading
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Campo de Senha
             OutlinedTextField(
@@ -229,12 +244,15 @@ fun LoginScreen(
                     }
                 },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textStyle = TextStyle(
+                    color = Color(0xFF1E232C)
+                ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp)
+                    .height(60.dp)
                     .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
                 enabled = !isLoading,
                 trailingIcon = {
@@ -244,14 +262,14 @@ fun LoginScreen(
                             painter = painterResource(id = R.drawable.fluent_eye),
                             contentDescription = "Mostrar/Esconder senha",
                             modifier = Modifier
-                                .size(30.dp) // Ajuste o tamanho do ícone, se necessário
+                                .size(30.dp)
                                 .padding(4.dp)
                         )
                     }
                 }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Botão "Esqueceu sua senha?"
             Text(
@@ -261,17 +279,15 @@ fun LoginScreen(
                     fontFamily = FontFamily(Font(R.font.urbanist)),
                     fontWeight = FontWeight(600),
                     color = Color(0xFF6A707C),
-                    textAlign = TextAlign.Right,
+                    textAlign = TextAlign.End
                 ),
                 modifier = Modifier
-                    .offset(230.dp, -15.dp)
+                    .fillMaxWidth()
                     .clickable {
                         context.startActivity(Intent(context, ForgetPasswordActivity::class.java))
                     }
-
             )
 
-            // Espacamento entre o botao de "esqueceu sua senha" e "entrar"
             Spacer(modifier = Modifier.height(15.dp))
 
             // Botão "entrar"
@@ -291,7 +307,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp),
+                    .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4500C9),
                     disabledContainerColor = Color(0xFF4500C9).copy(alpha = 0.5f),
@@ -346,8 +362,7 @@ fun LoginScreen(
         // Seção inferior
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(21.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -390,3 +405,12 @@ fun LoginScreen(
     }
 }
 
+@Preview
+@Composable
+fun PreviewLoginScreen() {
+    SuperIDTheme {
+        LoginScreen(
+            onLoginClick = { _, _, _ -> }
+        )
+    }
+}

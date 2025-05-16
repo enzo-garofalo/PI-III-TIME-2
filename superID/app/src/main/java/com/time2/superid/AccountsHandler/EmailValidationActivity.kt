@@ -43,6 +43,9 @@ import com.time2.superid.R
 import com.time2.superid.SuperIDTheme
 import com.time2.superid.utils.showShortToast
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.time2.superid.LoginActivity
 
 class EmailValidationActivity : ComponentActivity()
@@ -53,6 +56,19 @@ class EmailValidationActivity : ComponentActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+// Controla a visibilidade das barras do sistema
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            // Oculta a navigation bar (barra de menu)
+            hide(WindowInsetsCompat.Type.navigationBars())
+            // Garante que a status bar (barra de notificação) permaneça visível
+            show(WindowInsetsCompat.Type.statusBars())
+            // Define o comportamento para que a navigation bar não reapareça com gestos
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        window.statusBarColor = android.graphics.Color.BLACK
+
         setContent{
             SuperIDTheme {
                 emailValidationCompose(userAccountsManager)
@@ -184,5 +200,13 @@ fun emailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
                 fontSize = 14.sp
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewEmailValidationScreen() {
+    SuperIDTheme {
+        emailValidationView(UserAccountsManager())
     }
 }
