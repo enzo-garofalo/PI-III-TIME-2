@@ -3,7 +3,10 @@ package com.time2.superid.ui.components.bottomModalComponents
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,6 +27,7 @@ fun successContent()
 {
     Column(
         modifier = Modifier
+            .padding(WindowInsets.navigationBars.asPaddingValues())
             .background(color = Color.White)
             .fillMaxWidth()
             .padding(24.dp),
