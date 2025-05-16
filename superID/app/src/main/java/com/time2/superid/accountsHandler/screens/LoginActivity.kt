@@ -1,4 +1,4 @@
-package com.time2.superid.accountsHandler.screens
+package com.time2.superid
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,58 +9,39 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.time2.superid.HomeActivity
-import com.time2.superid.R
+import com.time2.superid.AccountsHandler.ForgetPasswordActivity
+import com.time2.superid.AccountsHandler.SignUpActivity
 import com.time2.superid.utils.redirectIfLogged
-import com.time2.superid.ui.theme.SuperIDTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class LoginActivity : ComponentActivity() {
 
@@ -70,6 +51,18 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Controla a visibilidade das barras do sistema
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            // Oculta a navigation bar (barra de menu)
+            hide(WindowInsetsCompat.Type.navigationBars())
+            // Garante que a status bar (barra de notificação) permaneça visível
+            show(WindowInsetsCompat.Type.statusBars())
+            // Define o comportamento para que a navigation bar não reapareça com gestos
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        window.statusBarColor = android.graphics.Color.BLACK
 
         if (redirectIfLogged(this, TAG)) return
 
@@ -105,11 +98,23 @@ class LoginActivity : ComponentActivity() {
                 }
             }
     }
+}
+
+@Composable
+fun SuperIDTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF4500C9),
+            onPrimary = Color.White
+        ),
+        content = content
+    )
+}
 
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String, (String) -> Unit) -> Unit,
-    modifier: Modifier = Modifier.Companion
+    modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -124,110 +129,107 @@ fun LoginScreen(
             .background(color = Color(0xFFFFFFFF))
             .padding(start = 22.dp, top = 30.dp, end = 22.dp, bottom = 30.dp),
         verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.Start
     ) {
 
-        Spacer(modifier = Modifier.Companion.height(20.dp))
 
         // Imagem do app
         Image(
             painter = painterResource(id = R.drawable.ic_launcher),
             contentDescription = "image description",
-            contentScale = ContentScale.Companion.FillBounds,
-            modifier = Modifier.Companion
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
                 .width(100.dp)
                 .height(100.dp)
-                .padding(top = 0.dp, start = 0.dp)
         )
 
         // Empurra os elementos para baixo
-        Spacer(modifier = Modifier.Companion.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Centraliza os elementos principais
+        // Texto de boas vindas
+        Text(
+            text = "Bem vindo de volta, faça o login para continuar",
+            style = TextStyle(
+                fontSize = 30.sp,
+                lineHeight = 39.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist)),
+                fontWeight = FontWeight(700),
+                color = Color(0xFF1E232C),
+                textAlign = TextAlign.Left,
+            ),
+            modifier = Modifier
+                .width(280.dp)
+                .height(117.dp)
+        )
+
+
         Column(
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-
-            // Texto de boas vindas
-            Text(
-                text = "Bem vindo de volta, faça o login para continuar",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                    lineHeight = 39.sp,
-                    fontFamily = FontFamily(Font(R.font.urbanist)),
-                    fontWeight = FontWeight(700),
-                    color = Color(0xFF1E232C),
-                    textAlign = TextAlign.Companion.Left,
-                ),
-                modifier = Modifier.Companion
-                    .offset(0.dp, -100.dp)
-                    .width(280.dp)
-                    .height(117.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Campo de e-mail
             OutlinedTextField(
                 value = email,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Companion.Transparent,
-                    focusedBorderColor = Color.Companion.Transparent,
-                    disabledBorderColor = Color.Companion.Transparent,
-                    errorBorderColor = Color.Companion.Transparent
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Transparent
                 ),
                 onValueChange = { input ->
-                    // Removendo espaços
                     email = input.replace(" ", "")
                 },
                 singleLine = true,
                 label = {
-                    Box(
-                        modifier = Modifier.Companion
-                            .fillMaxHeight()
-                            .offset(0.dp, -5.dp),
-                        contentAlignment = Alignment.Companion.CenterStart
+                    Box(modifier = Modifier
+                        .fillMaxHeight()
+                        .offset(0.dp, -5.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
                             text = "E-mail",
-                            textAlign = TextAlign.Companion.Center,
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
                                 fontFamily = FontFamily(Font(R.font.urbanist)),
                                 fontWeight = FontWeight(500),
-                                color = Color(0xFF8391A1)
+                                color = Color(0xFF8391A1),
                             )
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Companion.Email),
-                modifier = Modifier.Companion
+                textStyle = TextStyle(
+                    color = Color(0xFF1E232C)
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp)
-                    .background(
-                        color = Color(0xFFE8ECFA),
-                        shape = RoundedCornerShape(size = 80.dp)
-                    ),
+                    .height(60.dp)
+                    .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
                 enabled = !isLoading
             )
-            Spacer(modifier = Modifier.Companion.height(16.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Campo de Senha
             OutlinedTextField(
                 value = password,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Companion.Transparent,
-                    focusedBorderColor = Color.Companion.Transparent,
-                    disabledBorderColor = Color.Companion.Transparent,
-                    errorBorderColor = Color.Companion.Transparent
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Transparent
                 ),
                 onValueChange = { password = it },
                 label = {
-                    Box(
-                        modifier = Modifier.Companion
-                            .fillMaxHeight()
-                            .offset(0.dp, -5.dp),
-                        contentAlignment = Alignment.Companion.CenterStart
+                    Box(modifier = Modifier
+                        .fillMaxHeight()
+                        .offset(0.dp, -5.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
                             text = "Senha",
@@ -241,35 +243,33 @@ fun LoginScreen(
                         )
                     }
                 },
-                visualTransformation = if (passwordVisible) VisualTransformation.Companion.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Companion.Password),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textStyle = TextStyle(
+                    color = Color(0xFF1E232C)
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp)
-                    .background(
-                        color = Color(0xFFE8ECFA),
-                        shape = RoundedCornerShape(size = 80.dp)
-                    ),
+                    .height(60.dp)
+                    .background(color = Color(0xFFE8ECFA), shape = RoundedCornerShape(size = 80.dp)),
                 enabled = !isLoading,
                 trailingIcon = {
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
-                        modifier = Modifier.Companion.offset(0.dp, -5.dp)
-                    ) {
+                    IconButton(onClick = { passwordVisible = !passwordVisible },
+                        modifier = Modifier.offset(0.dp, -5.dp) ) {
                         Image(
                             painter = painterResource(id = R.drawable.fluent_eye),
                             contentDescription = "Mostrar/Esconder senha",
-                            modifier = Modifier.Companion
-                                .size(30.dp) // Ajuste o tamanho do ícone, se necessário
+                            modifier = Modifier
+                                .size(30.dp)
                                 .padding(4.dp)
                         )
                     }
                 }
             )
 
-            Spacer(modifier = Modifier.Companion.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Botão "Esqueceu sua senha?"
             Text(
@@ -279,18 +279,16 @@ fun LoginScreen(
                     fontFamily = FontFamily(Font(R.font.urbanist)),
                     fontWeight = FontWeight(600),
                     color = Color(0xFF6A707C),
-                    textAlign = TextAlign.Companion.Right,
+                    textAlign = TextAlign.End
                 ),
-                modifier = Modifier.Companion
-                    .offset(230.dp, -15.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable {
                         context.startActivity(Intent(context, ForgetPasswordActivity::class.java))
                     }
-
             )
 
-            // Espacamento entre o botao de "esqueceu sua senha" e "entrar"
-            Spacer(modifier = Modifier.Companion.height(15.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             // Botão "entrar"
             Button(
@@ -306,23 +304,23 @@ fun LoginScreen(
                         errorMessage = "Preencha todos os campos"
                     }
                 },
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .fillMaxWidth()
                     .width(331.dp)
-                    .height(66.dp),
+                    .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4500C9),
                     disabledContainerColor = Color(0xFF4500C9).copy(alpha = 0.5f),
-                    contentColor = Color.Companion.White,
-                    disabledContentColor = Color.Companion.White.copy(alpha = 0.5f)
+                    contentColor = Color.White,
+                    disabledContentColor = Color.White.copy(alpha = 0.5f)
                 ),
                 shape = RoundedCornerShape(size = 80.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.Companion.size(24.dp),
-                        color = Color.Companion.White
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
                     )
                 } else {
                     Text(
@@ -331,8 +329,8 @@ fun LoginScreen(
                             fontSize = 15.sp,
                             fontFamily = FontFamily(Font(R.font.urbanist)),
                             fontWeight = FontWeight(600),
-                            color = Color.Companion.White,
-                            textAlign = TextAlign.Companion.Center,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
                         )
                     )
                 }
@@ -340,10 +338,10 @@ fun LoginScreen(
 
             // Mensagem de erro
             errorMessage?.let {
-                Spacer(modifier = Modifier.Companion.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Box(
-                    modifier = Modifier.Companion.fillMaxWidth(),
-                    contentAlignment = Alignment.Companion.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = it,
@@ -359,15 +357,14 @@ fun LoginScreen(
         }
 
         // Empurrar a Row inferior para o fim da tela
-        Spacer(modifier = Modifier.Companion.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
         // Seção inferior
         Row(
-            modifier = Modifier.Companion
-                .fillMaxWidth()
-                .height(21.dp),
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Companion.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Não tem uma conta?",
@@ -377,15 +374,15 @@ fun LoginScreen(
                     fontFamily = FontFamily(Font(R.font.urbanist)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFF1E232C),
-                    textAlign = TextAlign.Companion.Center,
+                    textAlign = TextAlign.Center,
                     letterSpacing = 0.15.sp
                 ),
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .width(142.dp)
                     .height(21.dp)
             )
 
-            Spacer(modifier = Modifier.Companion.width(7.dp))
+            Spacer(modifier = Modifier.width(7.dp))
 
             //Botão que vai para a activity de SignUp
             Text(
@@ -396,15 +393,24 @@ fun LoginScreen(
                     fontFamily = FontFamily(Font(R.font.urbanist)),
                     fontWeight = FontWeight(700),
                     color = Color(0xFF4500C9),
-                    textAlign = TextAlign.Companion.Center,
+                    textAlign = TextAlign.Center,
                     letterSpacing = 0.15.sp
                 ),
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .clickable {
                         context.startActivity(Intent(context, SignUpActivity::class.java))
                     }
             )
         }
     }
-  }
+}
+
+@Preview
+@Composable
+fun PreviewLoginScreen() {
+    SuperIDTheme {
+        LoginScreen(
+            onLoginClick = { _, _, _ -> }
+        )
+    }
 }
