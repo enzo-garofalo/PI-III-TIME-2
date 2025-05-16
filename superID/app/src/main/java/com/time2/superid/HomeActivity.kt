@@ -6,10 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -22,11 +19,14 @@ import com.time2.learningui_ux.components.buildPasswordManager
 import com.time2.learningui_ux.components.buildTopAppBar
 import com.time2.learningui_ux.components.showCategoryElements
 import com.time2.learningui_ux.components.showPasswordList
+import com.time2.superid.AccountsHandler.UserAccountsManager
 import com.time2.superid.ui.theme.SuperIDTheme
+import com.time2.superid.utils.fetchUserProfile
 
 class HomeActivity : ComponentActivity() {
 
     private val auth: FirebaseAuth = Firebase.auth
+    private val userAccountsManager = UserAccountsManager()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,19 +34,33 @@ class HomeActivity : ComponentActivity() {
         setContent {
             SuperIDTheme {
                 var showModal by remember { mutableStateOf(false) }
+                var userName by remember { mutableStateOf("Carregando...") }
+                var isLoading by remember { mutableStateOf(true) }
+
+
+                LaunchedEffect(key1 = Unit) {
+                    fetchUserProfile(auth, userAccountsManager) { name ->
+                        userName = name
+                        isLoading = false
+                    }
+                }
 
                 Scaffold(
                     topBar = {
                         buildTopAppBar(
-                            userName = "JoãoGabriel",
-                            showBackClick =  false,
-                            onBackClick   =  { /*TODO*/},
-                            onLogoutClick =  { /*TODO*/},
+                            userName = userName,
+                            showBackClick = false,
+                            onBackClick = { /* Não Precisa */ },
+                            onLogoutClick = {
+                                auth.signOut()
+                                startActivity(Intent(this@HomeActivity, LoginActivity::class.java))
+                                finish()
+                            },
                         )
                     },
                     bottomBar = {
                         buildBottomBar(
-                            this
+                            this@HomeActivity
                         )
                     },
                     floatingActionButton = {
@@ -56,7 +70,7 @@ class HomeActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
-                        // Conteúdo principal da tela
+                        // Main screen content
                         buildCategoryHeader(
                             onSettingsClick = {/*TODO*/}
                         )
@@ -65,7 +79,7 @@ class HomeActivity : ComponentActivity() {
 
                         buildPasswordManager(
                             onAllFilterClick = {/*TODO*/},
-                            onRecentClick    = {/*TODO*/}
+                            onRecentClick = {/*TODO*/}
                         )
 
                         showPasswordList()

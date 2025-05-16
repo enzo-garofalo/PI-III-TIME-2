@@ -1,5 +1,6 @@
 package com.time2.superid.utils
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -13,6 +14,7 @@ import com.google.firebase.ktx.Firebase
 import com.time2.superid.AccountsHandler.UserAccount
 import com.time2.superid.HomeActivity
 import kotlinx.coroutines.tasks.await
+import com.time2.superid.AccountsHandler.UserAccountsManager
 
 fun getDeviceID(context: Context) : String
 {
@@ -49,3 +51,27 @@ fun redirectIfLogged(activity: ComponentActivity, TAG: String): Boolean {
     }
     return false
 }
+
+fun fetchUserProfile(
+    auth: FirebaseAuth,
+    userAccountsManager: UserAccountsManager,
+    onComplete: (String) -> Unit
+) {
+    val currentUser = auth.currentUser
+    if (currentUser != null) {
+        userAccountsManager.getUserProfileName(currentUser.uid) { name ->
+            if (name.isNotEmpty()) {
+                Log.d(TAG, "User name fetched successfully: $name")
+                onComplete(name)
+            } else {
+                Log.w(TAG, "User name not found, using email instead")
+                onComplete(currentUser.email ?: "Usuário")
+            }
+        }
+    } else {
+        Log.e(TAG, "No user is currently signed in")
+        onComplete("Usuário")
+    }
+}
+
+
