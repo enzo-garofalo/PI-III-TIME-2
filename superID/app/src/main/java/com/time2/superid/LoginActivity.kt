@@ -24,6 +24,7 @@ import com.time2.superid.AccountsHandler.SignUpActivity
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.redirectIfLogged
 
+
 class LoginActivity : ComponentActivity() {
 
     private val auth: FirebaseAuth = Firebase.auth
@@ -67,121 +68,123 @@ class LoginActivity : ComponentActivity() {
                 }
             }
     }
-}
+
+    // Função para exibir informações do perfil do usuário
 
 
-@Composable
-fun LoginScreen(
-    onLoginClick: (String, String, (String) -> Unit) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    @Composable
+    fun LoginScreen(
+        onLoginClick: (String, String, (String) -> Unit) -> Unit,
+        modifier: Modifier = Modifier
     ) {
-        // Campos de e-mail e senha (mantidos iguais)
-        OutlinedTextField(
-            value = email,
-            onValueChange = { input ->
-                // Removendo espaços
-                email = input.replace(" ", "").lowercase()
-            },
-            label = { Text("E-mail") },
-            // Impede quebra de linhas
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
-        )
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+        var isLoading by remember { mutableStateOf(false) }
+        val context = LocalContext.current
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Senha") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Botão de login (mantido igual)
-        Button(
-            onClick = {
-                if (email.isNotBlank() && password.isNotBlank()) {
-                    isLoading = true
-                    errorMessage = null
-                    onLoginClick(email, password) { error ->
-                        isLoading = false
-                        errorMessage = error
-                    }
-                } else {
-                    errorMessage = "Preencha todos os campos"
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Login")
-            }
-        }
-
-        // Botão "Esqueceu sua senha?"
-        TextButton(
-            onClick = {
-                context.startActivity(Intent(context, ForgetPasswordActivity::class.java))
-            },
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text(
-                text = "Esqueceu sua senha?",
-                color = MaterialTheme.colorScheme.primary
+            // Campos de e-mail e senha (mantidos iguais)
+            OutlinedTextField(
+                value = email,
+                onValueChange = { input ->
+                    // Removendo espaços
+                    email = input.replace(" ", "").lowercase()
+                },
+                label = { Text("E-mail") },
+                // Impede quebra de linhas
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             )
-        }
 
-        // Botão "Cadastre-se"
-        TextButton(
-            onClick = {
-                context.startActivity(Intent(context, SignUpActivity::class.java))
-            },
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text(
-                text = "Não tem uma conta?",
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Text(
-                text = "Cadastre-se",
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        // Mensagem de erro (mantida igual)
-        errorMessage?.let {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botão de login (mantido igual)
+            Button(
+                onClick = {
+                    if (email.isNotBlank() && password.isNotBlank()) {
+                        isLoading = true
+                        errorMessage = null
+                        onLoginClick(email, password) { error ->
+                            isLoading = false
+                            errorMessage = error
+                        }
+                    } else {
+                        errorMessage = "Preencha todos os campos"
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Login")
+                }
+            }
+
+            // Botão "Esqueceu sua senha?"
+            TextButton(
+                onClick = {
+                    context.startActivity(Intent(context, ForgetPasswordActivity::class.java))
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "Esqueceu sua senha?",
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            // Botão "Cadastre-se"
+            TextButton(
+                onClick = {
+                    context.startActivity(Intent(context, SignUpActivity::class.java))
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "Não tem uma conta?",
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "Cadastre-se",
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            // Mensagem de erro (mantida igual)
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
     }
 }
