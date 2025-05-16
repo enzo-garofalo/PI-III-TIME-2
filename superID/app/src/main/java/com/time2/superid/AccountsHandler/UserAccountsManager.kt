@@ -125,4 +125,6 @@ class UserAccountsManager {
                 showShortToast(context, "Erro ao salvar dados do usuário")
             }
     }
+
+
 }

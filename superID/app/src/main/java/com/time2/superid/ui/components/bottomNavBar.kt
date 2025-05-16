@@ -3,7 +3,11 @@ package com.time2.learningui_ux.components
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -49,6 +53,8 @@ fun bottomNavBar(
         shadowElevation = 4.dp // Sombra visível mesmo em temas claros
     ){
         NavigationBar(
+            modifier = Modifier
+                .padding(WindowInsets.navigationBars.asPaddingValues()),
             containerColor = MaterialTheme.colorScheme.background
         ){
             items.forEachIndexed {index, item ->

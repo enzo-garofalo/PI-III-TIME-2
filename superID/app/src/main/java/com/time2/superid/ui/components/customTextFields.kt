@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat.getFont
 import com.time2.superid.R
+import com.time2.superid.ui.theme.Surface
 
 @Composable
 fun emailTextField(
@@ -98,18 +100,26 @@ fun CustomTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp),
+            .fillMaxWidth(),
+            //.padding(top = .dp),
         label = {
-            Text(
-                text = label,
-                color = Color.Black,
-                style = TextStyle(
-                    color = Color.Black,
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
-                ),
-            )
+            Surface(
+                color = background, // aplica o mesmo fundo do campo ao redor da label
+                modifier = Modifier
+                    //.padding(0.dp)
+                    .background(Color.Transparent)// evita que a borda toque o texto
+            ) {
+                Text(
+                    text = label,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                    ),
+                    modifier = Modifier
+                        //.padding(0.dp)
+                        .background(Color.Transparent)
+                )
+            }
         },
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = background,
@@ -122,7 +132,7 @@ fun CustomTextField(
             disabledBorderColor = border,
             errorBorderColor = border,
         ),
-        shape = RoundedCornerShape(15.dp),
+        shape = RoundedCornerShape(80.dp),
         singleLine = isSingleLine
     )
 }

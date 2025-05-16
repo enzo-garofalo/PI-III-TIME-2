@@ -3,7 +3,9 @@
     <color name="purple_primary">#4B00D1</color> <!-- Botões, título selecionado, ícones principais -->
     <color name="purple_secondary">#B39DDB</color> <!-- Roxo claro, secundário (se necessário) -->
     <color name="pink_tertiary">#FF4081</color> <!-- Ícone de logout -->
-    <color name="border_color">#E8ECF4</color> <!-- Ícone de logout -->
+    <color name="border_color">#E8ECF4</color>
+    <color name="separator_color">#DCDCDC</color>
+    <color name="alert_color">#A20C07</color>
 
     <!-- Texto e contraste -->
     <color name="white">#FFFFFF</color>
