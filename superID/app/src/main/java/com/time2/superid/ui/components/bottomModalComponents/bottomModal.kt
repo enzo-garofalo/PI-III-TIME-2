@@ -68,7 +68,9 @@ fun buildBottomModal(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss
             )
-            "success" -> successContent()
+            "success" -> successContent(
+                onClose = onDismiss
+            )
         }
     }
 }

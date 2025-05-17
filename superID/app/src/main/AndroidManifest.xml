@@ -18,6 +18,7 @@
 
         <!-- Activity principal -->
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -26,6 +27,7 @@
 
         <!-- Activity de cadastro -->
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".AccountsHandler.SignUpActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -38,6 +40,7 @@
 
         <!-- Activity de recuperação de senha -->
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".AccountsHandler.ForgetPasswordActivity"
             android:exported="false"
             android:label="@string/app_name"
@@ -46,6 +49,7 @@
 
         <!-- Activity principal após login -->
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -53,6 +57,7 @@
 
         <!-- Activity de validação de email -->
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".AccountsHandler.EmailValidationActivity"
             android:exported="true"
             android:label="@string/app_name"
