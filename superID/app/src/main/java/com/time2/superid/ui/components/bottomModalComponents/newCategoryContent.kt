@@ -1,26 +1,33 @@
 package com.time2.superid.ui.components.bottomModalComponents
 
 import android.R.attr.text
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,15 +44,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
+import com.time2.superid.ui.components.CustomSelectField
 import com.time2.superid.ui.components.CustomTextField
 import com.time2.superid.ui.components.buildMissingFieldsDialog
+import com.time2.superid.ui.components.utils.rememberImeState
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun registerCategoryContent(
     currentModalState : (String) -> Unit,
     onClose: () -> Unit
 ) {
+    val imeState = rememberImeState()
+    val scrollState = rememberScrollState()
+
+    // Quando o teclado aparece, anima a rolagem para o final do conteúdo
+    LaunchedEffect(key1 = imeState.value) {
+        if (imeState.value) {
+            scrollState.animateScrollTo(scrollState.maxValue, tween(300))
+        }
+    }
+
     var showAlert by remember { mutableStateOf(false) }
     var missingFields by remember { mutableStateOf(listOf<String>()) }
 
@@ -87,7 +107,12 @@ fun registerCategoryContent(
         }
 
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState)
+                .imeNestedScroll()
+                .imePadding()
+                .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             var icone by remember { mutableStateOf("") }
             var nome by remember { mutableStateOf("") }
@@ -116,21 +141,24 @@ fun registerCategoryContent(
                     label = "* Nome:",
                     isSingleLine = true,
                     value = nome,
-                    onValueChange = { nome = it }
+                    onValueChange = { nome = it },
+                    isPassword = false
                 )
 
-                CustomTextField(
-                    label = "Ícone",
-                    isSingleLine = true,
-                    value = icone,
-                    onValueChange = { icone = it }
+                val icones = mutableListOf<String>("Icon 1", "Icon 2", "Icon3")
+                CustomSelectField(
+                    label = "Icone:",
+                    options = icones,
+                    selectedOption = icone,
+                    onOptionSelected = { icone = it }
                 )
 
                 CustomTextField(
                     label = "Descrição:",
                     isSingleLine = false,
                     value = descricao,
-                    onValueChange = { descricao = it }
+                    onValueChange = { descricao = it },
+                    isPassword = false
                 )
             }
 
