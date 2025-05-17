@@ -7,7 +7,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.time2.superid.R
 
 @Composable
 fun FilterButton(
@@ -30,7 +36,11 @@ fun FilterButton(
     ){
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall
+            style = TextStyle(
+                fontSize = 13.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist_bold)),
+                fontWeight = FontWeight(700)
+            )
         )
     }
 }
