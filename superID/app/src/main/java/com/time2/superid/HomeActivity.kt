@@ -6,36 +6,89 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.learningui_ux.components.buildBottomBar
+import com.time2.learningui_ux.components.buildBottomModal
+import com.time2.learningui_ux.components.buildCategoryHeader
+import com.time2.learningui_ux.components.buildFloatingActionButton
+import com.time2.learningui_ux.components.buildPasswordManager
+import com.time2.learningui_ux.components.buildTopAppBar
+import com.time2.learningui_ux.components.showCategoryElements
+import com.time2.learningui_ux.components.showPasswordList
+import com.time2.superid.AccountsHandler.UserAccountsManager
+import com.time2.superid.ui.theme.SuperIDTheme
+import com.time2.superid.utils.fetchUserProfile
 
 class HomeActivity : ComponentActivity() {
 
     private val auth: FirebaseAuth = Firebase.auth
+    private val userAccountsManager = UserAccountsManager()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SuperIDTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text("Você está logado no SuperID!")
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = {
-                            auth.signOut()
-                            startActivity(Intent(this@HomeActivity, LoginActivity::class.java))
-                            finish()
-                        }) {
-                            Text("Sair")
-                        }
+                var showModal by remember { mutableStateOf(false) }
+                var userName by remember { mutableStateOf("Carregando...") }
+                var isLoading by remember { mutableStateOf(true) }
+
+
+                LaunchedEffect(key1 = Unit) {
+                    fetchUserProfile(auth, userAccountsManager) { name ->
+                        userName = name
+                        isLoading = false
+                    }
+                }
+
+                Scaffold(
+                    topBar = {
+                        buildTopAppBar(
+                            userName = userName,
+                            showBackClick = false,
+                            onBackClick = { /* Não Precisa */ },
+                            onLogoutClick = {
+                                auth.signOut()
+                                startActivity(Intent(this@HomeActivity, LoginActivity::class.java))
+                                finish()
+                            },
+                        )
+                    },
+                    bottomBar = {
+                        buildBottomBar(
+                            this@HomeActivity
+                        )
+                    },
+                    floatingActionButton = {
+                        buildFloatingActionButton(
+                            onClick = { showModal = true }
+                        )
+                    }
+                ) { innerPadding ->
+                    Column(Modifier.padding(innerPadding)) {
+                        // Main screen content
+                        buildCategoryHeader(
+                            onSettingsClick = {/*TODO*/}
+                        )
+
+                        showCategoryElements()
+
+                        buildPasswordManager(
+                            onAllFilterClick = {/*TODO*/},
+                            onRecentClick = {/*TODO*/}
+                        )
+
+                        showPasswordList()
+                    }
+
+                    if (showModal) {
+                        buildBottomModal(
+                            onDismiss = { showModal = false }
+                        )
                     }
                 }
             }

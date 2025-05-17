@@ -2,10 +2,16 @@ package com.time2.superid.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val PurplePrimary = Color(0xFF4500C9)
+val PurpleSecondary = Color(0xFFB498E7)
+val GreyEnabled = Color(0xFFF3F3F3)
+val GreyBackground = Color(0xFFF7F8F9)
+val GreyStroke = Color(0xFFE8ECF4)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val White = Color(0xFFFFFFFF)
+val Black = Color(0xFF000000)
+
+val Background = Color(0xFFFFFFFF)
+val Surface = Color(0xFFF6F6F6)
+val SurfaceVariant = Color(0xFFEDEDED)
+val Outline = Color(0xFFCCCCCC)

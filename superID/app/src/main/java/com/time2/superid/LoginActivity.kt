@@ -32,6 +32,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.superid.AccountsHandler.ForgetPasswordActivity
 import com.time2.superid.AccountsHandler.SignUpActivity
+import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.redirectIfLogged
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextFieldDefaults
@@ -40,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+
 
 class LoginActivity : ComponentActivity() {
 
@@ -84,7 +86,6 @@ class LoginActivity : ComponentActivity() {
                 }
             }
     }
-}
 
 @Composable
 fun SuperIDTheme(content: @Composable () -> Unit) {
