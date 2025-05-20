@@ -40,7 +40,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.passwordHandler.PasswordManager
-import com.time2.superid.passwordHandler.Password
 
 import com.time2.superid.R
 import com.time2.superid.ui.components.structure.CustomSelectField
@@ -50,6 +49,7 @@ import com.time2.superid.ui.components.utils.rememberImeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Composable responsável pelo conteúdo do modal de registro de senhas.
@@ -99,7 +99,6 @@ fun registerPasswordContent(
             Icon(
                 painter = painterResource(id = R.drawable.ic_back_modal),
                 contentDescription = "Voltar",
-
                 modifier = Modifier
                     .padding(16.dp)
                     .size(30.dp)
@@ -120,14 +119,8 @@ fun registerPasswordContent(
             )
         }
 
-
         /**
          * Garante que o conteúdo seja rolável e responsivo ao teclado virtual (IME).
-         *
-         * - `imeNestedScroll()` permite que a rolagem do conteúdo funcione corretamente quando o teclado aparece,
-         *   repassando o gesto de rolagem para o teclado se necessário.
-         * - `imePadding()` adiciona padding automático na parte inferior para evitar que o teclado sobreponha o conteúdo.
-         *   Isso é essencial para manter campos visíveis durante a digitação.
          */
         Column(
             modifier = Modifier
@@ -138,11 +131,12 @@ fun registerPasswordContent(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             // Estados dos campos de entrada
-            var login by remember { mutableStateOf("") }
-            var nome by remember { mutableStateOf("") }
-            var senha by remember { mutableStateOf("") }
-            var categoria by remember { mutableStateOf("") }
-            var descricao by remember { mutableStateOf("") }
+            var username by remember { mutableStateOf("") }
+            var partnerSite by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+            var categoryId by remember { mutableStateOf("defaultSitesWeb") } // Valor padrão
+            var description by remember { mutableStateOf("") }
+            var type by remember { mutableStateOf("web") } // Valor padrão
 
             // Título principal
             Text(
@@ -165,41 +159,69 @@ fun registerPasswordContent(
             // Formulário de entrada com campos personalizados
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 CustomTextField(
-                    label = "* Nome:",
+                    label = "* Site/Serviço:",
                     isSingleLine = true,
-                    value = nome,
-                    onValueChange = { nome = it },
+                    value = partnerSite,
+                    onValueChange = { partnerSite = it },
                     isPassword = false
                 )
+
                 CustomTextField(
-                    label = "Login",
+                    label = "Nome de usuário:",
                     isSingleLine = true,
-                    value = login,
-                    onValueChange = { login = it },
+                    value = username,
+                    onValueChange = { username = it },
                     isPassword = false
                 )
+
                 CustomTextField(
-                    label = "* Senha de acesso:",
+                    label = "* Senha:",
                     isSingleLine = true,
-                    value = senha,
-                    onValueChange = { senha = it },
+                    value = password,
+                    onValueChange = { password = it },
                     isPassword = true
                 )
-                // Fazer a lista a partir do que o usuário tem (fazer uma query)
-                val categorias = listOf("Pessoal", "Trabalho", "Estudos")
+
+                // Opções de categoria
+                val categorias = listOf(
+                    "Sites Web" to "defaultSitesWeb",
+                    "Aplicativos" to "apps",
+                    "Bancos" to "banks",
+                    "Trabalho" to "work",
+                    "Pessoal" to "personal"
+                )
 
                 CustomSelectField(
                     label = "* Categoria:",
-                    options = categorias,
-                    selectedOption = categoria,
-                    onOptionSelected = { categoria = it }
+                    options = categorias.map { it.first },
+                    selectedOption = categorias.find { it.second == categoryId }?.first ?: "Sites Web",
+                    onOptionSelected = { selectedLabel ->
+                        categoryId = categorias.find { it.first == selectedLabel }?.second ?: "defaultSitesWeb"
+                    }
+                )
+
+                // Opções de tipo
+                val tipos = listOf(
+                    "Web" to "web",
+                    "Aplicativo" to "app",
+                    "PIN" to "pin",
+                    "Cartão" to "card"
+                )
+
+                CustomSelectField(
+                    label = "* Tipo:",
+                    options = tipos.map { it.first },
+                    selectedOption = tipos.find { it.second == type }?.first ?: "Web",
+                    onOptionSelected = { selectedLabel ->
+                        type = tipos.find { it.first == selectedLabel }?.second ?: "web"
+                    }
                 )
 
                 CustomTextField(
                     label = "Descrição:",
                     isSingleLine = false,
-                    value = descricao,
-                    onValueChange = { descricao = it },
+                    value = description,
+                    onValueChange = { description = it },
                     isPassword = false
                 )
             }
@@ -210,9 +232,8 @@ fun registerPasswordContent(
             Button(
                 onClick = {
                     val missing = mutableListOf<String>()
-                    if (nome.isBlank()) missing.add("Nome")
-                    if (senha.isBlank()) missing.add("Senha de acesso")
-                    if (categoria.isBlank()) missing.add("Categoria")
+                    if (partnerSite.isBlank()) missing.add("Site/Serviço")
+                    if (password.isBlank()) missing.add("Senha")
 
                     if (missing.isNotEmpty()) {
                         showAlert = true
@@ -222,25 +243,26 @@ fun registerPasswordContent(
                         if (user == null) {
                             // Aqui você pode mostrar uma mensagem de erro
                             println("Usuário não autenticado.")
-                            // Ex: Snackbar, Toast, AlertDialog etc.
                             return@Button
                         }
 
                         CoroutineScope(Dispatchers.IO).launch {
                             val success = repository.createPassword(
-                                Password(
-                                    name = nome,
-                                    login = login,
-                                    password = senha,
-                                    category = categoria,
-                                    description = descricao
-                                )
+                                categoryId = categoryId,
+                                partnerSite = partnerSite,
+                                username = username,
+                                password = password,
+                                description = description,
+                                type = type
                             )
-                            if (success) {
-                                currentModalState("success")
-                            } else {
-                                println("Erro ao registrar a senha.")
-                                // Mostre algum feedback para o usuário
+
+                            withContext(Dispatchers.Main) {
+                                if (success) {
+                                    currentModalState("success")
+                                } else {
+                                    println("Erro ao registrar a senha.")
+                                    // Aqui poderia implementar um feedback para o usuário
+                                }
                             }
                         }
                     }
@@ -257,6 +279,5 @@ fun registerPasswordContent(
                 )
             }
         }
-
     }
 }

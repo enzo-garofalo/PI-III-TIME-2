@@ -95,7 +95,7 @@ class singlePasswordActivity  : ComponentActivity()
 
                         buildSinglePasswordHeader(
                             onDeleteClick = {/*TODO*/},
-                            title = password!!.name
+                            title = password!!.username
                         )
                     }
                 }

@@ -1,24 +1,30 @@
 package com.time2.superid.passwordHandler
 
+import android.util.Base64
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.time2.superid.utils.AESEncryption
 import kotlinx.coroutines.tasks.await
 import android.util.Log
+import java.security.SecureRandom
 
 data class Password(
     val id: String = "",
-    val name: String = "",
-    val login: String = "",
-    val password: String = "", // Deve ser criptografada com a senha mestre
-    val category: String = "",
+    val categoryId: String = "defaultSitesWeb",
+    val partnerSite: String = "",
+    val username: String = "",
+    val password: String = "", // Será criptografada com AESEncryption
+    val accessToken: String = "",
     val description: String = "",
-    val createdAt: Timestamp = Timestamp.now()
+    val type: String = "web",
+    val createdAt: Timestamp = Timestamp.now(),
+    val lastUpdated: Timestamp = Timestamp.now()
 )
 
 /**
  * Repositório responsável por interagir com o Firestore,
- * gerenciando senhas dentro da subcoleção "Passwords" de cada usuário autenticado.
+ * gerenciando senhas dentro da coleção "userPasswords/{userId}/{passwordId}".
  */
 class PasswordManager {
 
@@ -26,25 +32,67 @@ class PasswordManager {
     private val auth = FirebaseAuth.getInstance()
 
     /**
-     * Obtém a referência à subcoleção "Passwords" do usuário autenticado.
+     * Obtém a referência à coleção "userPasswords/{userId}" do usuário autenticado.
      */
     private fun getPasswordsCollection() = auth.currentUser?.uid?.let { uid ->
-        db.collection("AccountsManager")
+        db.collection("userPasswords")
             .document(uid)
-            .collection("Passwords")
+            .collection("passwords")
     }
 
     /**
-     * Cria uma nova senha na subcoleção do usuário autenticado.
+     * Gera um token de acesso em Base64 de 256 caracteres
      */
-    suspend fun createPassword(password: Password): Boolean {
+    private fun generateAccessToken(): String {
+        val random = SecureRandom()
+        val bytes = ByteArray(192) // Aproximadamente 256 caracteres em Base64
+        random.nextBytes(bytes)
+        return Base64.encodeToString(bytes, Base64.NO_WRAP)
+    }
+
+    /**
+     * Cria uma nova senha na coleção do usuário autenticado.
+     */
+    suspend fun createPassword(
+        categoryId: String = "defaultSitesWeb",
+        partnerSite: String = "",
+        username: String = "",
+        password: String = "",
+        description: String = "",
+        type: String = "web"
+    ): Boolean {
         val collection = getPasswordsCollection() ?: return false.also {
             Log.e("PasswordManager", "Usuário não autenticado ao criar senha")
         }
 
         return try {
-            val docRef = collection.add(password).await()
-            // Atualiza o campo "id" com o ID gerado
+            // Gerar token de acesso
+            val accessToken = generateAccessToken()
+
+            // Criptografar a senha
+            val encryptedPassword = if (password.isNotEmpty()) {
+                AESEncryption.encrypt(password)
+            } else {
+                ""
+            }
+
+            // Criar objeto de senha com valores atualizados
+            val newPassword = Password(
+                categoryId = categoryId,
+                partnerSite = partnerSite,
+                username = username,
+                password = encryptedPassword,
+                accessToken = accessToken,
+                description = description,
+                type = type,
+                createdAt = Timestamp.now(),
+                lastUpdated = Timestamp.now()
+            )
+
+            // Adicionar ao Firestore
+            val docRef = collection.add(newPassword).await()
+
+            // Atualizar o campo "id" com o ID gerado
             docRef.update("id", docRef.id).await()
             true
         } catch (e: Exception) {
@@ -64,13 +112,16 @@ class PasswordManager {
             snapshot.documents.mapNotNull { doc ->
                 val data = doc.data ?: return@mapNotNull null
                 Password(
-                    id =  data["id"] as? String ?: doc.id,
-                    name = data["name"] as? String ?: "",
-                    login = data["login"] as? String ?: "",
+                    id = data["id"] as? String ?: doc.id,
+                    categoryId = data["categoryId"] as? String ?: "defaultSitesWeb",
+                    partnerSite = data["partnerSite"] as? String ?: "",
+                    username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
-                    category = data["category"] as? String ?: "",
+                    accessToken = data["accessToken"] as? String ?: "",
                     description = data["description"] as? String ?: "",
-                    createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now()
+                    type = data["type"] as? String ?: "web",
+                    createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
+                    lastUpdated = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
                 )
             }
         } catch (e: Exception) {
@@ -79,21 +130,27 @@ class PasswordManager {
         }
     }
 
-    suspend fun getPasswordById(docId: String): Password? {
+    /**
+     * Busca uma senha pelo ID.
+     */
+    suspend fun getPasswordById(passwordId: String): Password? {
         val collection = getPasswordsCollection() ?: return null
 
         return try {
-            val docSnapshot = collection.document(docId).get().await()
+            val docSnapshot = collection.document(passwordId).get().await()
             if (docSnapshot.exists()) {
                 val data = docSnapshot.data ?: return null
                 Password(
-                    id = docId,
-                    name = data["name"] as? String ?: "",
-                    login = data["login"] as? String ?: "",
+                    id = passwordId,
+                    categoryId = data["categoryId"] as? String ?: "defaultSitesWeb",
+                    partnerSite = data["partnerSite"] as? String ?: "",
+                    username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
-                    category = data["category"] as? String ?: "",
+                    accessToken = data["accessToken"] as? String ?: "",
                     description = data["description"] as? String ?: "",
-                    createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now()
+                    type = data["type"] as? String ?: "web",
+                    createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
+                    lastUpdated = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
                 )
             } else {
                 null
@@ -104,19 +161,30 @@ class PasswordManager {
         }
     }
 
-
     /**
-     * Atualiza uma senha existente na subcoleção do usuário.
+     * Atualiza uma senha existente na coleção do usuário.
      */
-    suspend fun updatePassword(password: Password): Boolean {
+    suspend fun updatePassword(password: Password, newPassword: String? = null): Boolean {
         val collection = getPasswordsCollection() ?: return false
 
         return try {
-            password.id?.let {
-                collection.document(it).set(password).await()
+            // Se uma nova senha foi fornecida, criptografá-la
+            val updatedPassword = if (newPassword != null) {
+                val encryptedPassword = AESEncryption.encrypt(newPassword)
+                password.copy(
+                    password = encryptedPassword,
+                    lastUpdated = Timestamp.now()
+                )
+            } else {
+                password.copy(lastUpdated = Timestamp.now())
+            }
+
+            if (password.id.isNotEmpty()) {
+                collection.document(password.id).set(updatedPassword).await()
                 true
-            } ?: false.also {
+            } else {
                 Log.e("PasswordManager", "ID da senha é nulo na atualização")
+                false
             }
         } catch (e: Exception) {
             Log.e("PasswordManager", "Erro ao atualizar senha: ${e.message}")
@@ -125,7 +193,28 @@ class PasswordManager {
     }
 
     /**
-     * Deleta uma senha da subcoleção do usuário autenticado.
+     * Atualiza apenas o accessToken de uma senha existente.
+     */
+    suspend fun refreshAccessToken(passwordId: String): Boolean {
+        val collection = getPasswordsCollection() ?: return false
+
+        return try {
+            val newAccessToken = generateAccessToken()
+            collection.document(passwordId).update(
+                mapOf(
+                    "accessToken" to newAccessToken,
+                    "lastUpdated" to Timestamp.now()
+                )
+            ).await()
+            true
+        } catch (e: Exception) {
+            Log.e("PasswordManager", "Erro ao atualizar token de acesso: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Deleta uma senha da coleção do usuário autenticado.
      */
     suspend fun deletePassword(passwordId: String): Boolean {
         val collection = getPasswordsCollection() ?: return false
@@ -136,6 +225,19 @@ class PasswordManager {
         } catch (e: Exception) {
             Log.e("PasswordManager", "Erro ao deletar senha: ${e.message}")
             false
+        }
+    }
+
+    /**
+     * Descriptografa uma senha para exibição.
+     */
+    fun decryptPassword(encryptedPassword: String): String {
+        return try {
+            if (encryptedPassword.isEmpty()) return ""
+            AESEncryption.decrypt(encryptedPassword)
+        } catch (e: Exception) {
+            Log.e("PasswordManager", "Erro ao descriptografar senha: ${e.message}")
+            ""
         }
     }
 }
