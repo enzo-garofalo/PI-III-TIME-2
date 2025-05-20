@@ -1,5 +1,7 @@
 package com.time2.learningui_ux.components
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,50 +20,77 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.passwordHandler.screens.singlePasswordActivity
+import kotlinx.coroutines.launch
 
 data class Element(
-    val title : String = "",
+    val isPassword : Boolean = false,
+    val id : String = "",
+    val title: String = "",
     val description: String? = null,
     val category: String
 )
 
-
 @Composable
 fun buildElementsShowCase(
-  elemetsList: List<Element>
-){
+    elementsList: List<Element>
+) {
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
-    ){
-        itemsIndexed(elemetsList){ index, item ->
+    ) {
+        itemsIndexed(elementsList) { index, item ->
             elementButton(item)
         }
     }
 }
 
+// Modificar if no clickable se for categoria terá uma lógica diferente
 @Composable
 fun elementButton(
     element: Element
-){
+) {
+
+    // Bundle é o parametro que a Activity pode receber
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(2.dp)
             .shadow(elevation = 1.5.dp, shape = RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
-            .clickable{ /*TODO*/}
+            .clickable {
+
+                val bundle = Bundle().apply {
+                    putString("docId", element.id)
+                }
+
+                if(element.isPassword)
+                {
+                    val intent = Intent(context, singlePasswordActivity::class.java).apply {
+                        putExtras(bundle)
+                    }
+                    context.startActivity(intent)
+                }
+            }
             .background(Color.White)
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .padding(12.dp)
-        ){
+        ) {
             // icon
             createIcon(element.category, "${element.category} icon")
 
@@ -88,25 +117,35 @@ fun elementButton(
 }
 
 @Composable
-fun showPasswordList()
-{
-    val passwordsList = listOf<Element>(
-        Element(
-            title = "Instagram",
-            description = "Minha conta no instagram",
-            category = "social"
-        ),
-        Element(
-            title = "Santander",
-            description = "Senha do Banco",
-            category = "bank"
-        ),
-        Element(
-            title = "Portão",
-            description = "Porta do apartamento",
-            category = "pinpad"
-        )
-    )
+fun showPasswordList() {
+    // Create a coroutine scope for launching suspend functions
+    val coroutineScope = rememberCoroutineScope()
+    // State to hold the list of elements
+    val elementsList = remember { mutableStateOf<List<Element>>(emptyList()) }
 
-    buildElementsShowCase(passwordsList)
+    // Instance of PasswordRepository
+    val passwordManager = PasswordManager()
+
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+
+            val passwords = passwordManager.getPasswords()
+
+            val elements = passwords.map { password ->
+                Element(
+                    isPassword = true,
+                    id = password.id,
+                    title = password.name,
+                    description = password.description,
+                    category = password.category
+                )
+            }
+
+            elementsList.value = elements
+        }
+    }
+
+    // Display the list of elements
+    buildElementsShowCase(elementsList.value)
 }

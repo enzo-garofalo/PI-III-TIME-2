@@ -1,4 +1,4 @@
-package com.time2.superid.AccountsHandler
+package com.time2.superid.AccountsHandler.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -31,8 +31,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
+import com.time2.superid.AccountsHandler.UserAccountsManager
 import com.time2.superid.utils.showShortToast
-import com.time2.superid.LoginActivity
+import com.time2.superid.AccountsHandler.screens.LoginActivity
 import com.time2.superid.R
 import com.time2.superid.screens.TermsOfUseActivity
 import com.time2.superid.utils.redirectIfLogged

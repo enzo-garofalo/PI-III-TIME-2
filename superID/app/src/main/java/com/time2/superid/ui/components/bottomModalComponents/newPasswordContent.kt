@@ -8,26 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,11 +39,17 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.passwordHandler.Password
+
 import com.time2.superid.R
-import com.time2.superid.ui.components.CustomSelectField
-import com.time2.superid.ui.components.CustomTextField
-import com.time2.superid.ui.components.buildMissingFieldsDialog
+import com.time2.superid.ui.components.structure.CustomSelectField
+import com.time2.superid.ui.components.structure.CustomTextField
+import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Composable responsável pelo conteúdo do modal de registro de senhas.
@@ -60,7 +61,7 @@ import com.time2.superid.ui.components.utils.rememberImeState
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun registerPasswordContent(
-    currentModalState : (String) -> Unit,
+    currentModalState: (String) -> Unit,
     onClose: () -> Unit
 ) {
     val imeState = rememberImeState()
@@ -84,6 +85,8 @@ fun registerPasswordContent(
         onDismiss = { showAlert = false }
     )
 
+    val repository = remember { PasswordManager() }
+
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -96,6 +99,7 @@ fun registerPasswordContent(
             Icon(
                 painter = painterResource(id = R.drawable.ic_back_modal),
                 contentDescription = "Voltar",
+
                 modifier = Modifier
                     .padding(16.dp)
                     .size(30.dp)
@@ -214,7 +218,31 @@ fun registerPasswordContent(
                         showAlert = true
                         missingFields = missing
                     } else {
-                        currentModalState("success")
+                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            // Aqui você pode mostrar uma mensagem de erro
+                            println("Usuário não autenticado.")
+                            // Ex: Snackbar, Toast, AlertDialog etc.
+                            return@Button
+                        }
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val success = repository.createPassword(
+                                Password(
+                                    name = nome,
+                                    login = login,
+                                    password = senha,
+                                    category = categoria,
+                                    description = descricao
+                                )
+                            )
+                            if (success) {
+                                currentModalState("success")
+                            } else {
+                                println("Erro ao registrar a senha.")
+                                // Mostre algum feedback para o usuário
+                            }
+                        }
                     }
                 },
                 shape = RoundedCornerShape(50),
