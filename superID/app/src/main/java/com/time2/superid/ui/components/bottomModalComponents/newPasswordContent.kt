@@ -3,37 +3,12 @@ package com.time2.superid.ui.components.bottomModalComponents
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imeNestedScroll
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,40 +24,37 @@ import com.time2.superid.ui.components.CustomSelectField
 import com.time2.superid.ui.components.CustomTextField
 import com.time2.superid.ui.components.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
+import com.time2.superid.HomeHandler.utils.Password
+import com.time2.superid.HomeHandler.utils.PasswordRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-/**
- * Composable responsável pelo conteúdo do modal de registro de senhas.
- * O layout permanece fixo na parte inferior da tela, mesmo com o teclado aberto.
- *
- * @param currentModalState Função que define o próximo estado do modal
- * @param onClose Callback para fechar o modal
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun registerPasswordContent(
-    currentModalState : (String) -> Unit,
+    currentModalState: (String) -> Unit,
     onClose: () -> Unit
 ) {
     val imeState = rememberImeState()
     val scrollState = rememberScrollState()
 
-    // Quando o teclado aparece, anima a rolagem para o final do conteúdo
     LaunchedEffect(key1 = imeState.value) {
         if (imeState.value) {
             scrollState.animateScrollTo(scrollState.maxValue, tween(300))
         }
     }
 
-    // Estado para exibir alerta de campos obrigatórios
     var showAlert by remember { mutableStateOf(false) }
     var missingFields by remember { mutableStateOf(listOf<String>()) }
 
-    // Diálogo de alerta para campos obrigatórios não preenchidos
     buildMissingFieldsDialog(
         show = showAlert,
         missingFields = missingFields,
         onDismiss = { showAlert = false }
     )
+
+    val repository = remember { PasswordRepository() }
 
     Column(
         modifier = Modifier
@@ -116,15 +88,6 @@ fun registerPasswordContent(
             )
         }
 
-
-        /**
-         * Garante que o conteúdo seja rolável e responsivo ao teclado virtual (IME).
-         *
-         * - `imeNestedScroll()` permite que a rolagem do conteúdo funcione corretamente quando o teclado aparece,
-         *   repassando o gesto de rolagem para o teclado se necessário.
-         * - `imePadding()` adiciona padding automático na parte inferior para evitar que o teclado sobreponha o conteúdo.
-         *   Isso é essencial para manter campos visíveis durante a digitação.
-         */
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -133,14 +96,12 @@ fun registerPasswordContent(
                 .imePadding()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            // Estados dos campos de entrada
             var login by remember { mutableStateOf("") }
             var nome by remember { mutableStateOf("") }
             var senha by remember { mutableStateOf("") }
             var categoria by remember { mutableStateOf("") }
             var descricao by remember { mutableStateOf("") }
 
-            // Título principal
             Text(
                 text = "Cadastre uma nova senha",
                 style = TextStyle(
@@ -150,7 +111,6 @@ fun registerPasswordContent(
                 )
             )
 
-            // Aviso de campos obrigatórios
             Text(
                 text = "** Campo obrigatório",
                 color = colorResource(id = R.color.alert_color),
@@ -158,7 +118,6 @@ fun registerPasswordContent(
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
 
-            // Formulário de entrada com campos personalizados
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 CustomTextField(
                     label = "* Nome:",
@@ -181,16 +140,13 @@ fun registerPasswordContent(
                     onValueChange = { senha = it },
                     isPassword = true
                 )
-                // Fazer a lista a partir do que o usuário tem (fazer uma query)
                 val categorias = listOf("Pessoal", "Trabalho", "Estudos")
-
                 CustomSelectField(
                     label = "* Categoria:",
                     options = categorias,
                     selectedOption = categoria,
                     onOptionSelected = { categoria = it }
                 )
-
                 CustomTextField(
                     label = "Descrição:",
                     isSingleLine = false,
@@ -202,7 +158,6 @@ fun registerPasswordContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botão de envio dos dados
             Button(
                 onClick = {
                     val missing = mutableListOf<String>()
@@ -214,7 +169,31 @@ fun registerPasswordContent(
                         showAlert = true
                         missingFields = missing
                     } else {
-                        currentModalState("success")
+                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            // Aqui você pode mostrar uma mensagem de erro
+                            println("Usuário não autenticado.")
+                            // Ex: Snackbar, Toast, AlertDialog etc.
+                            return@Button
+                        }
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val success = repository.createPassword(
+                                Password(
+                                    name = nome,
+                                    login = login,
+                                    password = senha,
+                                    category = categoria,
+                                    description = descricao
+                                )
+                            )
+                            if (success) {
+                                currentModalState("success")
+                            } else {
+                                println("Erro ao registrar a senha.")
+                                // Mostre algum feedback para o usuário
+                            }
+                        }
                     }
                 },
                 shape = RoundedCornerShape(50),
@@ -229,6 +208,5 @@ fun registerPasswordContent(
                 )
             }
         }
-
     }
 }

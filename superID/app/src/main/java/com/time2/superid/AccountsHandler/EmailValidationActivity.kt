@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
-import com.time2.superid.SuperIDTheme
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class EmailValidationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

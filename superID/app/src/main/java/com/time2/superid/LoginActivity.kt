@@ -389,5 +389,6 @@ fun LoginScreen(
             )
         }
     }
+  }
 }
 
