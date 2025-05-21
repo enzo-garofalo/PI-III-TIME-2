@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.time2.superid.PasswordHandler.screens.editPasswordContent
+import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
 import com.time2.superid.ui.components.bottomModalComponents.registerCategoryContent
 import com.time2.superid.ui.components.bottomModalComponents.registerPasswordContent
@@ -18,12 +20,14 @@ import com.time2.superid.ui.components.bottomModalComponents.successContent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun buildBottomModal(
-    onDismiss : () -> Unit
+    onDismiss : () -> Unit,
+    currentModal : String,
+    password : Password? = null
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
-    var currentModal by remember { mutableStateOf("menu") }
+    var currentModal by remember { mutableStateOf(currentModal) }
 
     LaunchedEffect(currentModal) {
         if (currentModal == "password" || currentModal == "category" || currentModal == "menu") {
@@ -44,10 +48,18 @@ fun buildBottomModal(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss
             )
+
             "password" -> registerPasswordContent(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss
             )
+
+            "editPassword" -> editPasswordContent(
+                currentModalState = { currentModal = it },
+                onClose = onDismiss,
+                password = password!!
+            )
+
             "category" -> registerCategoryContent(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss

@@ -1,4 +1,4 @@
-package com.time2.superid.ui.components.bottomModalComponents
+package com.time2.superid.PasswordHandler.screens
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -39,9 +39,9 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.time2.superid.passwordHandler.PasswordManager
-
 import com.time2.superid.R
+import com.time2.superid.passwordHandler.Password
+import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.structure.CustomSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
@@ -60,9 +60,10 @@ import kotlinx.coroutines.withContext
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun registerPasswordContent(
+fun editPasswordContent(
     currentModalState: (String) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    password: Password
 ) {
     val imeState = rememberImeState()
     val scrollState = rememberScrollState()
@@ -95,29 +96,22 @@ fun registerPasswordContent(
             .heightIn(min = 500.dp)
     ) {
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_back_modal),
-                contentDescription = "Voltar",
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(30.dp)
-                    .align(Alignment.TopStart)
-                    .clickable { currentModalState("menu") },
-                tint = Color.Unspecified
-            )
+//        Box(modifier = Modifier.fillMaxWidth()) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.ic_close),
+//                contentDescription = "Fechar",
+//                modifier = Modifier
+//                    .padding(16.dp)
+//                    .size(30.dp)
+//                    .align(Alignment.TopEnd)
+//                    .clickable { onClose() },
+//                tint = Color.Unspecified
+//            )
+//        }
 
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "Fechar",
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(30.dp)
-                    .align(Alignment.TopEnd)
-                    .clickable { onClose() },
-                tint = Color.Unspecified
-            )
-        }
+        /**
+         * Garante que o conteúdo seja rolável e responsivo ao teclado virtual (IME).
+         */
 
         /**
          * Garante que o conteúdo seja rolável e responsivo ao teclado virtual (IME).
@@ -131,15 +125,19 @@ fun registerPasswordContent(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             // Estados dos campos de entrada
-            var username by remember { mutableStateOf("") }
-            var passwodTitle by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-            var category by remember { mutableStateOf("") }
-            var description by remember { mutableStateOf("") }
+            var username by remember { mutableStateOf(password.username) }
+            var passwodTitle by remember { mutableStateOf(password.passwordTitle) }
+
+            val pm = PasswordManager()
+            val decrypted = pm.decryptPassword(password.password)
+
+            var passwordToedit by remember { mutableStateOf(decrypted) }
+            var category by remember { mutableStateOf(password.category) }
+            var description by remember { mutableStateOf(password.description) }
 
             // Título principal
             Text(
-                text = "Cadastre uma nova senha",
+                text = "Altere sua senha",
                 style = TextStyle(
                     fontSize = 30.sp,
                     lineHeight = 36.sp,
@@ -149,8 +147,8 @@ fun registerPasswordContent(
 
             // Aviso de campos obrigatórios
             Text(
-                text = "** Campo obrigatório",
-                color = colorResource(id = R.color.alert_color),
+                text = "Mantenha suas informações seguras e sempre atualizadas.",
+                color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
@@ -185,8 +183,8 @@ fun registerPasswordContent(
                 CustomTextField(
                     label = "* Senha:",
                     isSingleLine = true,
-                    value = password,
-                    onValueChange = { password = it },
+                    value = passwordToedit,
+                    onValueChange = { passwordToedit = it },
                     isPassword = true
                 )
 
@@ -225,7 +223,7 @@ fun registerPasswordContent(
                 onClick = {
                     val missing = mutableListOf<String>()
                     if (passwodTitle.isBlank()) missing.add("Site/Serviço")
-                    if (password.isBlank()) missing.add("Senha")
+                    if (passwordToedit.isBlank()) missing.add("Senha")
 
                     if (missing.isNotEmpty()) {
                         showAlert = true
@@ -239,21 +237,24 @@ fun registerPasswordContent(
                         }
 
                         CoroutineScope(Dispatchers.IO).launch {
-                            val success = repository.createPassword(
-                                category = category,
-                                description = description,
-                                partnerSite = "url",
+                            val success = repository.updatePassword(
                                 password = password,
-                                passwordTitle = passwodTitle,
-                                username = username
+                                newUsername = username,
+                                newPassword = passwordToedit,
+                                newDescription = description,
+                                newPasswordTitle = passwodTitle,
+                                newCategory = category,
+                                newPartnerSite = password.partnerSite // substitua por uma variável se quiser editar
                             )
 
                             withContext(Dispatchers.Main) {
                                 if (success) {
+                                    // Fecha modal ou mostra snackbar de sucesso
                                     currentModalState("success")
+                                    onClose()
                                 } else {
-                                    println("Erro ao registrar a senha.")
-                                    // Aqui poderia implementar um feedback para o usuário
+                                    // Exibe erro
+                                    currentModalState("error")
                                 }
                             }
                         }
@@ -265,7 +266,25 @@ fun registerPasswordContent(
                     .height(56.dp)
             ) {
                 Text(
-                    text = "Registrar nova senha",
+                    text = "Alterar senha",
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    onClose()
+                },
+                shape = RoundedCornerShape(50),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "Voltar",
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                 )

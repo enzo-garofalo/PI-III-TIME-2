@@ -11,15 +11,16 @@ import java.security.SecureRandom
 
 data class Password(
     val id: String = "",
-    val categoryId: String = "defaultSitesWeb",
-    val partnerSite: String = "",
-    val username: String = "",
-    val password: String = "",
     val accessToken: String = "",
+    val category: String = "",
     val description: String = "",
-    val type: String = "web",
+    val partnerSite: String = "",
+    val password: String = "",
+    val passwordTitle: String = "",
+    val username: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val lastUpdated: Timestamp = Timestamp.now()
+
 )
 
 /**
@@ -54,12 +55,12 @@ class PasswordManager {
      * Cria uma nova senha na coleção do usuário autenticado.
      */
     suspend fun createPassword(
-        categoryId: String = "defaultSitesWeb",
-        partnerSite: String = "",
-        username: String = "",
-        password: String = "",
+        category: String = "",
         description: String = "",
-        type: String = "web"
+        partnerSite: String = "",
+        password: String = "",
+        passwordTitle: String = "",
+        username: String = ""
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false.also {
             Log.e("PasswordManager", "Usuário não autenticado ao criar senha")
@@ -78,15 +79,16 @@ class PasswordManager {
 
             // Criar objeto de senha com valores atualizados
             val newPassword = Password(
-                categoryId = categoryId,
-                partnerSite = partnerSite,
-                username = username,
-                password = encryptedPassword,
+                category = category,
                 accessToken = accessToken,
                 description = description,
-                type = type,
+                partnerSite = partnerSite,
+                password = encryptedPassword,
+                passwordTitle = passwordTitle,
+                username = username,
                 createdAt = Timestamp.now(),
                 lastUpdated = Timestamp.now()
+
             )
 
             // Adicionar ao Firestore
@@ -113,13 +115,13 @@ class PasswordManager {
                 val data = doc.data ?: return@mapNotNull null
                 Password(
                     id = data["id"] as? String ?: doc.id,
-                    categoryId = data["categoryId"] as? String ?: "defaultSitesWeb",
+                    category = data["category"] as? String ?: "defaultSitesWeb",
                     partnerSite = data["partnerSite"] as? String ?: "",
                     username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
+                    passwordTitle = data["passwordTitle"] as? String ?: "",
                     accessToken = data["accessToken"] as? String ?: "",
                     description = data["description"] as? String ?: "",
-                    type = data["type"] as? String ?: "web",
                     createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
                     lastUpdated = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
                 )
@@ -142,13 +144,13 @@ class PasswordManager {
                 val data = docSnapshot.data ?: return null
                 Password(
                     id = passwordId,
-                    categoryId = data["categoryId"] as? String ?: "defaultSitesWeb",
+                    category = data["categoryId"] as? String ?: "defaultSitesWeb",
                     partnerSite = data["partnerSite"] as? String ?: "",
                     username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
+                    passwordTitle = data["passwordTitle"] as? String ?: "",
                     accessToken = data["accessToken"] as? String ?: "",
                     description = data["description"] as? String ?: "",
-                    type = data["type"] as? String ?: "web",
                     createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
                     lastUpdated = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
                 )
@@ -168,7 +170,10 @@ class PasswordManager {
         password: Password,
         newUsername: String? = null,
         newPassword: String? = null,
-        newDescription: String? = null
+        newDescription: String? = null,
+        newPasswordTitle: String? = null,
+        newCategory: String? = null,
+        newPartnerSite: String? = null
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false
 
@@ -179,16 +184,14 @@ class PasswordManager {
                 return false
             }
 
-            // Gerar novo token de acesso
-            val newAccessToken = generateAccessToken()
-
-            // Construir o objeto Password atualizado
+            // Atualiza campos fornecidos, mantém os antigos caso não sejam informados
             var updatedPassword = password.copy(
-                // Atualizar campos apenas se novos valores forem fornecidos
                 username = newUsername ?: password.username,
                 description = newDescription ?: password.description,
-                // Sempre atualizar o token de acesso e timestamp
-                accessToken = newAccessToken,
+                passwordTitle = newPasswordTitle ?: password.passwordTitle,
+                category = newCategory ?: password.category,
+                partnerSite = newPartnerSite ?: password.partnerSite,
+                accessToken = generateAccessToken(),
                 lastUpdated = Timestamp.now()
             )
 

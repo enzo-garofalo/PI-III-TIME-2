@@ -88,7 +88,8 @@ class HomeActivity : ComponentActivity() {
 
                     if (showModal) {
                         buildBottomModal(
-                            onDismiss = { showModal = false }
+                            onDismiss = { showModal = false },
+                            currentModal = "menu"
                         )
                     }
                 }

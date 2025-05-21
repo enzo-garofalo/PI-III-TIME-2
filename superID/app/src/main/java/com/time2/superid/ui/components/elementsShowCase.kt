@@ -136,9 +136,9 @@ fun showPasswordList() {
                 Element(
                     isPassword = true,
                     id = password.id,
-                    title = password.username,
+                    title = password.passwordTitle,
                     description = password.description,
-                    category = password.type
+                    category = password.category
                 )
             }
 

@@ -5,8 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,16 +23,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.time2.learningui_ux.components.Element
 import com.time2.learningui_ux.components.FilterButton
+import com.time2.learningui_ux.components.buildBottomModal
 import com.time2.learningui_ux.components.buildSinglePasswordHeader
 import com.time2.learningui_ux.components.buildTopAppBar
+import com.time2.learningui_ux.components.elementButton
 import com.time2.superid.AccountsHandler.UserAccountsManager
 import com.time2.superid.AccountsHandler.screens.LoginActivity
 import com.time2.superid.HomeActivity
+import com.time2.superid.R
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.structure.CustomTextField
@@ -56,6 +67,7 @@ class singlePasswordActivity  : ComponentActivity()
 
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
+                var reloadTrigger by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
@@ -64,7 +76,11 @@ class singlePasswordActivity  : ComponentActivity()
                     }
                 }
 
-                LaunchedEffect(docId) {
+                // Este LaunchedEffect é responsável por recarregar a senha sempre que:
+                // - a Activity for criada (quando docId mudar)
+                // - ou quando o valor de reloadTrigger mudar (forçado manualmente após uma atualização)
+                // Isso garante que a senha exibida na tela estará sempre atualizada
+                LaunchedEffect(docId, reloadTrigger) {
                     password = passwordManager.getPasswordById(docId ?: "")
                     Log.w("Aqui", "$password")
                 }
@@ -93,35 +109,13 @@ class singlePasswordActivity  : ComponentActivity()
                 ) { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
                         if (password != null) {
-                            // Primeiro exibe o cabeçalho
-                            buildSinglePasswordHeader(
-                                onDeleteClick = {
-                                    coroutineScope.launch {
-                                        val deleted = passwordManager.deletePassword(docId.toString())
-                                        if (deleted) {
-                                            // Volta para a tela inicial após deletar
-                                            startActivity(
-                                                Intent(this@singlePasswordActivity, HomeActivity::class.java)
-                                            )
-                                            finish()
-                                        } else {
-                                            Log.e("Delete", "Erro ao deletar senha")
-                                        }
-                                    }
-                                },
-                                title = password!!.partnerSite ?: password!!.username
-                            )
-
-                            // Em seguida, exibe o conteúdo da senha usando a função SinglePasswordContent
                             SinglePasswordContent(
                                 password = password!!,
                                 onDeleteClick = {
                                     coroutineScope.launch {
                                         val deleted = passwordManager.deletePassword(docId.toString())
                                         if (deleted) {
-                                            startActivity(
-                                                Intent(this@singlePasswordActivity, HomeActivity::class.java)
-                                            )
+                                            startActivity(Intent(this@singlePasswordActivity, HomeActivity::class.java))
                                             finish()
                                         } else {
                                             Log.e("Delete", "Erro ao deletar senha")
@@ -144,55 +138,95 @@ fun SinglePasswordContent(
     password: Password,
     onDeleteClick: () -> Unit
 ) {
-    // Criar um CoroutineScope para poder chamar funções suspensas
-    val coroutineScope = rememberCoroutineScope()
 
-    Column {
-        val decryptPassword = AESEncryption.decrypt(password.password)
-        // Removido o cabeçalho duplicado aqui, pois já está na função principal
-        val newUsername by remember { mutableStateOf(password.username.toString()) }
-        var newPassword by remember { mutableStateOf(decryptPassword.toString()) }
-        var newDescription by remember { mutableStateOf(password.description.toString()) }
+    var showEditModal by remember { mutableStateOf(false) }
 
-        // Estado para controlar mensagens de feedback ao usuário
-        var showUpdateMessage by remember { mutableStateOf(false) }
-        var updateSuccess by remember { mutableStateOf(false) }
 
-        CustomTextField(
-            label = "Login",
-            isSingleLine = true,
-            value = newUsername,  // Corrigido para usar newUsername em vez de newPassword
-            onValueChange = { /* Não é mutável, pois foi declarado com val */ },
-            isPassword = false
+    Column{
+        buildSinglePasswordHeader(
+            onDeleteClick = onDeleteClick,
+            title = password.passwordTitle
         )
 
-        CustomTextField(
-            label = "Senha",
-            isSingleLine = true,
-            value = newPassword,
-            onValueChange = { newPassword = it },
-            isPassword = true
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-        CustomTextField(
-            label = "Descrição",
-            isSingleLine = false,
-            value = newDescription,
-            onValueChange = { newDescription = it },
-            isPassword = false
-        )
-
-        val pm = PasswordManager()
-
-        // Mostrar mensagem de feedback se necessário
-        if (showUpdateMessage) {
-            Text(
-                text = if (updateSuccess) "Senha atualizada com sucesso!" else "Erro ao atualizar senha",
-                color = if (updateSuccess) Color.Green else Color.Red,
-                modifier = Modifier.padding(8.dp)
+            CustomTextField(
+                label = "Login",
+                isSingleLine = true,
+                value = password.username,
+                onValueChange = { /*Nothing To do here*/ },
+                isPassword = false
             )
-        }
 
+            val pm = PasswordManager()
+            val decrypted = pm.decryptPassword(password.password)
+
+            CustomTextField(
+                label = "Senha",
+                isSingleLine = true,
+                value = decrypted,
+                onValueChange = { /*Nothing To do here*/ },
+                isPassword = true
+            )
+
+            CustomTextField(
+                label = "Descrição",
+                isSingleLine = false,
+                value = password.description,
+                onValueChange = { /*Nothing To do here*/ },
+                isPassword = false
+            )
+
+            // TODO: melhorar ao criar categoia
+            val categ = Element(
+                isPassword = false,
+                id = "",
+                title = password.category,
+                description = null,
+                category = "social"
+            )
+
+            elementButton(categ)
+
+            Button(
+                onClick = { /*todo*/ },
+                shape = RoundedCornerShape(50),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(53.dp)
+            ) {
+                Text(
+                    text = "Escanear QRcode",
+                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                )
+            }
+
+            Button(
+                onClick = { showEditModal = true },
+                shape = RoundedCornerShape(50),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(53.dp)
+            ) {
+                Text(
+                    text = "Atualizar minha conta",
+                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                )
+            }
+        }
+    }
+
+    if (showEditModal) {
+        buildBottomModal(
+            onDismiss = { showEditModal = false },
+            currentModal = "editPassword",
+            password = password
+        )
     }
 }
 
