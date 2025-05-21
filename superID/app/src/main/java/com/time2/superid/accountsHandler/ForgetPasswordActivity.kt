@@ -22,8 +22,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+<<<<<<< HEAD:superID/app/src/main/java/com/time2/superid/accountsHandler/ForgetPasswordActivity.kt
 import com.time2.superid.accountsHandler.screens.EmailValidationActivity
 import com.time2.superid.accountsHandler.screens.LoginActivity
+=======
+import com.time2.superid.LoginActivity
+>>>>>>> 3126667152ca64d13fc1672eaf4c0cc396602494:superID/app/src/main/java/com/time2/superid/AccountsHandler/ForgetPasswordActivity.kt
 import com.time2.superid.ui.theme.SuperIDTheme
 
 class ForgetPasswordActivity : ComponentActivity() {

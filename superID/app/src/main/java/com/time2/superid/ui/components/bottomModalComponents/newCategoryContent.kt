@@ -1,5 +1,6 @@
 package com.time2.superid.ui.components.bottomModalComponents
 
+import android.R.attr.text
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,12 +40,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
-import com.time2.superid.ui.components.structure.CustomSelectField
-import com.time2.superid.ui.components.structure.CustomTextField
-import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
+import com.time2.superid.ui.components.CustomSelectField
+import com.time2.superid.ui.components.CustomTextField
+import com.time2.superid.ui.components.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
 
 

@@ -19,7 +19,7 @@
         <!-- Activity principal -->
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".accountsHandler.screens.LoginActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID">
@@ -28,7 +28,7 @@
         <!-- Activity de cadastro -->
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".accountsHandler.screens.SignUpActivity"
+            android:name=".AccountsHandler.SignUpActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID">
@@ -41,11 +41,11 @@
         <!-- Activity de recuperação de senha -->
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".accountsHandler.screens.ForgetPasswordActivity"
+            android:name=".AccountsHandler.ForgetPasswordActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"
-            android:parentActivityName=".accountsHandler.screens.LoginActivity" />
+            android:parentActivityName=".LoginActivity" />
 
         <!-- Activity principal após login -->
         <activity
@@ -58,7 +58,7 @@
         <!-- Activity de validação de email -->
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".accountsHandler.screens.EmailValidationActivity"
+            android:name=".AccountsHandler.EmailValidationActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"/>
@@ -70,14 +70,6 @@
             android:theme="@style/Theme.SuperID"
             android:screenOrientation="portrait"
         />
-
-        <!-- Activity de single password -->
-        <activity
-            android:windowSoftInputMode="adjustResize"
-            android:name=".passwordHandler.screens.singlePasswordActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.SuperID"/>
 
     </application>
 

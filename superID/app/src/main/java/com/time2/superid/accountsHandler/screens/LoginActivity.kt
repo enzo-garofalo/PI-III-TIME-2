@@ -64,8 +64,12 @@ import com.time2.superid.R
 import com.time2.superid.AccountsHandler.ForgetPasswordActivity
 import com.time2.superid.AccountsHandler.SignUpActivity
 import com.time2.superid.ui.theme.SuperIDTheme
+<<<<<<< HEAD:superID/app/src/main/java/com/time2/superid/accountsHandler/screens/LoginActivity.kt
 >>>>>>> 3126667 (Feat: Home and Register modals completed (#50)):superID/app/src/main/java/com/time2/superid/LoginActivity.kt
+=======
+>>>>>>> 3126667152ca64d13fc1672eaf4c0cc396602494:superID/app/src/main/java/com/time2/superid/LoginActivity.kt
 import com.time2.superid.utils.redirectIfLogged
+
 
 
 class LoginActivity : ComponentActivity() {
