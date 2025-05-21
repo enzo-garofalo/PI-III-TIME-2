@@ -57,9 +57,16 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+<<<<<<< HEAD:superID/app/src/main/java/com/time2/superid/accountsHandler/screens/LoginActivity.kt
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
+=======
+import com.time2.superid.AccountsHandler.ForgetPasswordActivity
+import com.time2.superid.AccountsHandler.SignUpActivity
+import com.time2.superid.ui.theme.SuperIDTheme
+>>>>>>> 3126667 (Feat: Home and Register modals completed (#50)):superID/app/src/main/java/com/time2/superid/LoginActivity.kt
 import com.time2.superid.utils.redirectIfLogged
+
 
 class LoginActivity : ComponentActivity() {
 
