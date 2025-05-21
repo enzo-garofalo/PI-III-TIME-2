@@ -1,4 +1,4 @@
-package com.time2.superid.AccountsHandler.screens
+package com.time2.superid.accountsHandler.screens
 
 import android.content.Intent
 import android.os.Bundle

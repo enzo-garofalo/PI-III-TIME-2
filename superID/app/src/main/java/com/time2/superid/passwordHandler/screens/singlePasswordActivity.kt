@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -30,13 +29,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.learningui_ux.components.Element
-import com.time2.learningui_ux.components.FilterButton
 import com.time2.learningui_ux.components.buildBottomModal
 import com.time2.learningui_ux.components.buildSinglePasswordHeader
 import com.time2.learningui_ux.components.buildTopAppBar
 import com.time2.learningui_ux.components.elementButton
-import com.time2.superid.AccountsHandler.UserAccountsManager
-import com.time2.superid.AccountsHandler.screens.LoginActivity
+import com.time2.superid.accountsHandler.UserAccountsManager
+import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.passwordHandler.Password
@@ -45,8 +43,6 @@ import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import kotlinx.coroutines.launch
-import com.time2.superid.utils.AESEncryption
-import kotlinx.coroutines.delay
 
 
 class singlePasswordActivity  : ComponentActivity()

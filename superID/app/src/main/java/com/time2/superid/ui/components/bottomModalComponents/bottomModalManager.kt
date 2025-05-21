@@ -14,7 +14,7 @@ import com.time2.superid.passwordHandler.screens.editPasswordContent
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
 import com.time2.superid.ui.components.bottomModalComponents.registerCategoryContent
-import com.time2.superid.PasswordHandler.screens.registerPasswordContent
+import com.time2.superid.passwordHandler.screens.registerPasswordContent
 import com.time2.superid.ui.components.bottomModalComponents.successContent
 
 @OptIn(ExperimentalMaterial3Api::class)

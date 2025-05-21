@@ -15,11 +15,11 @@ import com.time2.learningui_ux.components.buildBottomBar
 import com.time2.learningui_ux.components.buildBottomModal
 import com.time2.learningui_ux.components.buildCategoryHeader
 import com.time2.learningui_ux.components.buildFloatingActionButton
-import com.time2.superid.AccountsHandler.screens.LoginActivity
+import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.learningui_ux.components.buildTopAppBar
 import com.time2.learningui_ux.components.showCategoryElements
 import com.time2.learningui_ux.components.showPasswordList
-import com.time2.superid.AccountsHandler.UserAccountsManager
+import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import com.time2.learningui_ux.components.buildMyPasswordHeader

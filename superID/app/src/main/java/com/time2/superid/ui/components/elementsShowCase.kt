@@ -126,7 +126,6 @@ fun showPasswordList() {
     // Instance of PasswordRepository
     val passwordManager = PasswordManager()
 
-
     LaunchedEffect(Unit) {
         coroutineScope.launch {
 

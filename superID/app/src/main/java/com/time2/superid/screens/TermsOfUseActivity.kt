@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.time2.superid.AccountsHandler.screens.SignUpActivity
+import com.time2.superid.accountsHandler.screens.SignUpActivity
 import com.time2.superid.R
 
 class TermsOfUseActivity : ComponentActivity() {

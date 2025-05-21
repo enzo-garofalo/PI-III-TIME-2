@@ -6,15 +6,11 @@ import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.time2.superid.AccountsHandler.UserAccount
 import com.time2.superid.HomeActivity
-import kotlinx.coroutines.tasks.await
-import com.time2.superid.AccountsHandler.UserAccountsManager
+import com.time2.superid.accountsHandler.UserAccountsManager
 
 fun getDeviceID(context: Context) : String
 {
