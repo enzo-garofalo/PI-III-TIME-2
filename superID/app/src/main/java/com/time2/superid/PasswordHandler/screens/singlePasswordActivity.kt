@@ -121,6 +121,9 @@ class singlePasswordActivity  : ComponentActivity()
                                             Log.e("Delete", "Erro ao deletar senha")
                                         }
                                     }
+                                },
+                                onReloadTrigger = {
+                                    reloadTrigger = !reloadTrigger
                                 }
                             )
                         } else {
@@ -136,7 +139,8 @@ class singlePasswordActivity  : ComponentActivity()
 @Composable
 fun SinglePasswordContent(
     password: Password,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onReloadTrigger: () -> Unit
 ) {
 
     var showEditModal by remember { mutableStateOf(false) }
@@ -223,7 +227,10 @@ fun SinglePasswordContent(
 
     if (showEditModal) {
         buildBottomModal(
-            onDismiss = { showEditModal = false },
+            onDismiss = {
+                showEditModal = false
+                onReloadTrigger()
+            },
             currentModal = "editPassword",
             password = password
         )

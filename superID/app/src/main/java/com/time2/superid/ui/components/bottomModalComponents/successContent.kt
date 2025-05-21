@@ -32,7 +32,7 @@ import com.time2.superid.R
 
 @Composable
 fun successContent(
-    onClose: () -> Unit
+    onClose: () -> Unit,
 )
 {
     Column(

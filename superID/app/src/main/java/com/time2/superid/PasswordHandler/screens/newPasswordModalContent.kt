@@ -1,4 +1,4 @@
-package com.time2.superid.ui.components.bottomModalComponents
+package com.time2.superid.PasswordHandler.screens
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
