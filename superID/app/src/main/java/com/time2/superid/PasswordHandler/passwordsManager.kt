@@ -14,7 +14,7 @@ data class Password(
     val categoryId: String = "defaultSitesWeb",
     val partnerSite: String = "",
     val username: String = "",
-    val password: String = "", // Será criptografada com AESEncryption
+    val password: String = "",
     val accessToken: String = "",
     val description: String = "",
     val type: String = "web",
@@ -45,7 +45,7 @@ class PasswordManager {
      */
     private fun generateAccessToken(): String {
         val random = SecureRandom()
-        val bytes = ByteArray(192) // Aproximadamente 256 caracteres em Base64
+        val bytes = ByteArray(192)
         random.nextBytes(bytes)
         return Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
@@ -164,19 +164,38 @@ class PasswordManager {
     /**
      * Atualiza uma senha existente na coleção do usuário.
      */
-    suspend fun updatePassword(password: Password, newPassword: String? = null): Boolean {
+    suspend fun updatePassword(
+        password: Password,
+        newUsername: String? = null,
+        newPassword: String? = null,
+        newDescription: String? = null
+    ): Boolean {
         val collection = getPasswordsCollection() ?: return false
 
         return try {
-            // Se uma nova senha foi fornecida, criptografá-la
-            val updatedPassword = if (newPassword != null) {
+            // Verificar se pelo menos um campo está sendo atualizado
+            if (newUsername == null && newPassword == null && newDescription == null) {
+                Log.w("PasswordManager", "Nenhum campo para atualizar")
+                return false
+            }
+
+            // Gerar novo token de acesso
+            val newAccessToken = generateAccessToken()
+
+            // Construir o objeto Password atualizado
+            var updatedPassword = password.copy(
+                // Atualizar campos apenas se novos valores forem fornecidos
+                username = newUsername ?: password.username,
+                description = newDescription ?: password.description,
+                // Sempre atualizar o token de acesso e timestamp
+                accessToken = newAccessToken,
+                lastUpdated = Timestamp.now()
+            )
+
+            // Se uma nova senha foi fornecida, criptografá-la e atualizar
+            if (newPassword != null) {
                 val encryptedPassword = AESEncryption.encrypt(newPassword)
-                password.copy(
-                    password = encryptedPassword,
-                    lastUpdated = Timestamp.now()
-                )
-            } else {
-                password.copy(lastUpdated = Timestamp.now())
+                updatedPassword = updatedPassword.copy(password = encryptedPassword)
             }
 
             if (password.id.isNotEmpty()) {
@@ -212,7 +231,6 @@ class PasswordManager {
             false
         }
     }
-
     /**
      * Deleta uma senha da coleção do usuário autenticado.
      */

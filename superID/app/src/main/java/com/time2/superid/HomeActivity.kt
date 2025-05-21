@@ -22,6 +22,7 @@ import com.time2.learningui_ux.components.showPasswordList
 import com.time2.superid.AccountsHandler.UserAccountsManager
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
+import com.time2.learningui_ux.components.buildMyPasswordHeader
 
 class HomeActivity : ComponentActivity() {
 
@@ -77,7 +78,10 @@ class HomeActivity : ComponentActivity() {
 
                         showCategoryElements()
 
-
+                        buildMyPasswordHeader(
+                            onAllFilterClick = {/*TODO*/},
+                            onRecentClick = {/*TODO*/}
+                        )
 
                         showPasswordList()
                     }
