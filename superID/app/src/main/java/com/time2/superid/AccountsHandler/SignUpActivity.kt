@@ -288,7 +288,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                     IconButton(onClick = { passwordVisible = !passwordVisible },
                         modifier = Modifier.offset(0.dp, -5.dp) ) {
                         Image(
-                            painter = painterResource(id = R.drawable.fluent_eye),
+                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_eye else R.drawable.ic_blind_eye),
                             contentDescription = "Mostrar/Esconder senha",
                             modifier = Modifier
                                 .size(30.dp)
@@ -344,7 +344,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                     IconButton(onClick = { passwordVisible = !passwordVisible },
                         modifier = Modifier.offset(0.dp, -5.dp) ) {
                         Image(
-                            painter = painterResource(id = R.drawable.fluent_eye),
+                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_eye else R.drawable.ic_blind_eye),
                             contentDescription = "Mostrar/Esconder senha",
                             modifier = Modifier
                                 .size(30.dp)
