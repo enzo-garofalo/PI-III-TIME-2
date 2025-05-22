@@ -1,4 +1,4 @@
-package com.time2.superid.screens
+package com.time2.superid.accountsHandler.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -37,8 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.time2.superid.accountsHandler.screens.SignUpActivity
 import com.time2.superid.R
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class TermsOfUseActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,18 +50,6 @@ class TermsOfUseActivity : ComponentActivity() {
             }
         }
     }
-
-}
-
-@Composable
-fun SuperIDTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = Color(0xFF4500C9),
-            onPrimary = Color.White
-        ),
-        content = content
-    )
 }
 
 @Composable
@@ -71,7 +59,7 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(35.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-            .padding(start = 21.dp, top = 31.dp, end = 21.dp, bottom = 31.dp)
+            .padding(start = 21.dp, top = 60.dp, end = 21.dp, bottom = 31.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Box(

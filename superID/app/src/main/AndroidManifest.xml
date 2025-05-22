@@ -64,7 +64,7 @@
             android:theme="@style/Theme.SuperID"/>
 
         <activity
-            android:name=".screens.TermsOfUseActivity"
+            android:name=".accountsHandler.screens.TermsOfUseActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"
@@ -75,6 +75,13 @@
         <activity
             android:windowSoftInputMode="adjustResize"
             android:name=".passwordHandler.screens.singlePasswordActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SuperID"/>
+
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".accountsHandler.screens.ForgetPassEmailSendActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"/>

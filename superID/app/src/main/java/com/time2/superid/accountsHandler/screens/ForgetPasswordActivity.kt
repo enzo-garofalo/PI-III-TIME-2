@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
@@ -106,7 +107,7 @@ fun ForgetPasswordScreen() {
                         FirebaseAuth.getInstance().sendPasswordResetEmail(email)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    val intent = Intent(context, EmailValidationActivity::class.java)
+                                    val intent = Intent(context, ForgetPassEmailSendActivity::class.java)
                                     context.startActivity(intent)
                                 } else {
                                     Toast.makeText(

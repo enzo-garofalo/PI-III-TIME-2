@@ -34,7 +34,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.utils.showShortToast
 import com.time2.superid.R
-import com.time2.superid.screens.TermsOfUseActivity
 import com.time2.superid.utils.redirectIfLogged
 
 
@@ -57,16 +56,6 @@ class SignUpActivity : ComponentActivity()
     }
 }
 
-@Composable
-fun SuperIDTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = Color(0xFF4500C9),
-            onPrimary = Color.White
-        ),
-        content = content
-    )
-}
 
 @Composable
 fun SignUpView( modifier: Modifier = Modifier)

@@ -60,6 +60,7 @@ import com.google.firebase.ktx.Firebase
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.utils.redirectIfLogged
+import com.time2.superid.ui.theme.SuperIDTheme
 
 class LoginActivity : ComponentActivity() {
 
@@ -104,17 +105,6 @@ class LoginActivity : ComponentActivity() {
                 }
             }
     }
-
-@Composable
-fun SuperIDTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = Color(0xFF4500C9),
-            onPrimary = Color.Companion.White
-        ),
-        content = content
-    )
-}
 
 @Composable
 fun LoginScreen(
