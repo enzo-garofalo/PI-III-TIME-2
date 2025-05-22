@@ -162,6 +162,23 @@ fun LoginScreen(
                 .height(117.dp)
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Aviso de campo obrigatorio
+        Text(
+            text = "* Campo obrigatório!",
+            style = TextStyle(
+                fontSize = 15.sp,
+                lineHeight = 21.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist)),
+                fontWeight = FontWeight(700),
+                color = Color(0xFFFF0000),
+                textAlign = TextAlign.Start,
+            ),
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight()
+        )
 
         Column(
             verticalArrangement = Arrangement.Center,
@@ -190,7 +207,7 @@ fun LoginScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "E-mail",
+                            text = "* E-mail",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
@@ -232,7 +249,7 @@ fun LoginScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Senha",
+                            text = "* Senha",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
@@ -279,7 +296,7 @@ fun LoginScreen(
                     fontFamily = FontFamily(Font(R.font.urbanist)),
                     fontWeight = FontWeight(600),
                     color = Color(0xFF6A707C),
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.Right
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

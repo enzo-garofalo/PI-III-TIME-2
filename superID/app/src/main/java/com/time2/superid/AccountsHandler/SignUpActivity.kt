@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.ui.theme.SuperIDTheme
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -128,6 +129,24 @@ fun SignUpView(modifier: Modifier = Modifier) {
                 .wrapContentHeight()
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Aviso de campo obrigatorio
+        Text(
+            text = "* Campo obrigatório!",
+            style = TextStyle(
+                fontSize = 15.sp,
+                lineHeight = 21.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist)),
+                fontWeight = FontWeight(700),
+                color = Color(0xFFFF0000),
+                textAlign = TextAlign.Start,
+            ),
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight()
+        )
+
         // Centraliza os elementos principais
         Column(
             verticalArrangement = Arrangement.Center,
@@ -155,7 +174,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Nome",
+                            text = "* Nome",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
@@ -200,7 +219,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "E-mail",
+                            text = "* E-mail",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
@@ -242,7 +261,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Senha",
+                            text = "* Senha",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
@@ -298,7 +317,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Confirme sua senha",
+                            text = "* Confirme sua senha",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 lineHeight = 18.75.sp,
