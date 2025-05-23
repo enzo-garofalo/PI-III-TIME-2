@@ -5,10 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -38,6 +40,7 @@ import com.time2.superid.utils.showShortToast
 import com.time2.superid.LoginActivity
 import com.time2.superid.R
 import com.time2.superid.utils.redirectIfLogged
+import com.time2.superid.utils.rememberImeState
 
 class SignUpActivity : ComponentActivity() {
     private val TAG: String = "SIGN_UP"
@@ -91,6 +94,14 @@ fun SignUpView(modifier: Modifier = Modifier) {
     var isLoading by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val imeState = rememberImeState()
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = imeState.value) {
+        if (imeState.value) {
+            scrollState.animateScrollTo(scrollState.maxValue, tween(300))
+            }
+       }
 
     Column(
         modifier = modifier
