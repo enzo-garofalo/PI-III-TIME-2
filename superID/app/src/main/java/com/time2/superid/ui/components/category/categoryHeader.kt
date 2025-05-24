@@ -3,8 +3,11 @@ package com.time2.learningui_ux.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,37 +64,71 @@ fun buildCategoryHeader(
 
 @Composable
 fun buildSingleCategoryHeader(
-    category : Category
-){
-    Row(
+    category: Category
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Column {
-            Text(
-                text = "Suas senhas para categoria:",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontFamily = FontFamily(Font(R.font.urbanist_regular))
-                ),
-                color = Color.Gray
-            )
-            Row {
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Text(
+            text = "Suas senhas para categoria:",
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist_regular))
+            ),
+            color = Color.Gray
+        )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
                 createIcon(
                     iconName = category.iconName,
                     iconTitle = category.title
                 )
 
-                Text(
-                    text = "${category.title}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.Black
-                )
+                Spacer(modifier = Modifier.width(12.dp))
 
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = category.title,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                        ),
+                        color = Color.Black
+                    )
+                    Text(
+                        text = category.description,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist_regular))
+                        ),
+                        color = Color.Gray,
+                        maxLines = 1,
+                    )
+                }
+            }
+
+            IconButton(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "Configurações de categoria ${category.title}",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

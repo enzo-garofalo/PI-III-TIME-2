@@ -37,6 +37,8 @@ import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.structure.CustomTextField
@@ -181,12 +183,19 @@ fun SinglePasswordCompose(
             )
 
             // TODO: melhorar ao criar categoia
+            val catMan = CategoryManager()
+            var category by remember { mutableStateOf(Category()) }
+
+            LaunchedEffect(Unit) {
+                category = catMan.getCategoryById(password.categoryId)!!
+            }
+
             val categ = Element(
                 isPassword = false,
                 id = "",
-                title = password.category.title,
-                description = password.category.description,
-                category = password.category
+                title = category.title,
+                description = category.description,
+                category = category
             )
 
             elementButton(categ)
