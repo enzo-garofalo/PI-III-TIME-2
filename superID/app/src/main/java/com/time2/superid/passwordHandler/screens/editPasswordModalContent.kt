@@ -40,8 +40,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.ui.components.structure.CustomCategorySelectField
 import com.time2.superid.ui.components.structure.CustomSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
@@ -189,20 +192,19 @@ fun editPasswordContent(
                 )
 
                 // Opções de categoria
-                val categorias = listOf(
-                    "Sites Web" to "defaultSitesWeb",
-                    "Aplicativos" to "apps",
-                    "Bancos" to "banks",
-                    "Trabalho" to "work",
-                    "Pessoal" to "personal"
-                )
+                val categoryManager = remember { CategoryManager() }
+                val categoriesState = remember { mutableStateOf<List<Category>>(emptyList()) }
 
-                CustomSelectField(
-                    label = "* Categoria:",
-                    options = categorias.map { it.first },
-                    selectedOption = categorias.find { it.second == category }?.first ?: "Sites Web",
-                    onOptionSelected = { selectedLabel ->
-                        category = categorias.find { it.first == selectedLabel }?.second ?: "defaultSitesWeb"
+                LaunchedEffect(Unit) {
+                    categoriesState.value = categoryManager.getCategories()
+                }
+
+                CustomCategorySelectField(
+                    label         = "* Categoria:",
+                    options       = categoriesState.value,
+                    selectedOption= category,
+                    onOptionSelected = { selected ->
+                        category = selected
                     }
                 )
 

@@ -1,10 +1,13 @@
 package com.time2.superid.ui.components.structure
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
@@ -24,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -37,6 +41,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.ui.components.category.getCategoryIcon
 
 @Composable
 fun emailTextField(
@@ -172,88 +178,184 @@ fun CustomSelectField(
     onOptionSelected: (String) -> Unit
 ) {
     // Variáveis de cor
+    val border     = colorResource(id = R.color.border_color)
+    val background = MaterialTheme.colorScheme.onTertiary
+
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded       = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        // Text field that opens the dropdown
+        OutlinedTextField(
+            value         = selectedOption,
+            onValueChange = { /* read-only */ },
+            readOnly      = true,
+            enabled       = true,
+            label         = {
+                Surface(color = background) {
+                    Text(
+                        text  = label,
+                        style = TextStyle(
+                            fontSize     = 15.sp,
+                            fontFamily   = FontFamily(Font(R.font.urbanist_medium))
+                        )
+                    )
+                }
+            },
+            trailingIcon  = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier      = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            colors        = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor    = background,
+                unfocusedContainerColor  = background,
+                disabledContainerColor   = background,
+                errorContainerColor      = background,
+
+                focusedBorderColor       = border,
+                unfocusedBorderColor     = border,
+                disabledBorderColor      = border,
+                errorBorderColor         = border
+            ),
+            shape         = RoundedCornerShape(80.dp),
+            singleLine    = true
+        )
+
+        // The dropdown menu itself
+        ExposedDropdownMenu(
+            expanded        = expanded,
+            onDismissRequest = { expanded = false },
+            modifier        = Modifier.background(background)
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text  = option,
+                            style = TextStyle(
+                                fontSize   = 15.sp,
+                                fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                            )
+                        )
+                    },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomCategorySelectField(
+    label: String,
+    options: List<Category>,
+    selectedOption: Category?,
+    onOptionSelected: (Category) -> Unit
+) {
     val border = colorResource(id = R.color.border_color)
     val background = MaterialTheme.colorScheme.onTertiary
 
     var expanded by remember { mutableStateOf(false) }
-    var textFieldValue by remember { mutableStateOf(selectedOption) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
-            value = textFieldValue,
-            enabled = true,
+            value = selectedOption?.title ?: "",
+            onValueChange = {},
             readOnly = true,
-            onValueChange = { },
             label = {
-                Surface(
-                    color = background,
-                    modifier = Modifier.background(Color.Transparent)
-                ) {
+                Surface(color = background) {
                     Text(
                         text = label,
                         style = TextStyle(
                             fontSize = 15.sp,
                             fontFamily = FontFamily(Font(R.font.urbanist_medium))
-                        ),
-                        modifier = Modifier.background(Color.Transparent)
+                        )
                     )
                 }
             },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            leadingIcon = {
+                selectedOption?.let {
+                    Icon(
+                        painter = getCategoryIcon(it.iconName),
+                        contentDescription = "Ícone da categoria",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = background,
-                unfocusedContainerColor = background,
-                disabledContainerColor = background,
-                errorContainerColor = background,
-
-                focusedBorderColor = border,
-                unfocusedBorderColor = border,
-                disabledBorderColor = border,
-                errorBorderColor = border,
+                focusedContainerColor    = background,
+                unfocusedContainerColor  = background,
+                disabledContainerColor   = background,
+                errorContainerColor      = background,
+                focusedBorderColor       = border,
+                unfocusedBorderColor     = border,
+                disabledBorderColor      = border,
+                errorBorderColor         = border
             ),
             shape = RoundedCornerShape(80.dp),
             singleLine = true
         )
 
-        // Filter options based on text field value
-        val filteringOptions =
-            options.filter { it.contains(textFieldValue, ignoreCase = true) }
-
-        if (filteringOptions.isNotEmpty()) {
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .background(background)
-            ) {
-                filteringOptions.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = {
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(background)
+        ) {
+            options.forEach { category ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
                             Text(
-                                text = selectionOption,
+                                text = category.title,
                                 style = TextStyle(
                                     fontSize = 15.sp,
                                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                                 )
                             )
-                        },
-                        onClick = {
-                            textFieldValue = selectionOption
-                            onOptionSelected(selectionOption)
-                            expanded = false
-                        },
-                        colors = MenuDefaults.itemColors(
-                            textColor = MaterialTheme.colorScheme.onSurface
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = getCategoryIcon(category.iconName),
+                            contentDescription = "Ícone da categoria",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
                         )
+                    },
+                    onClick = {
+                        onOptionSelected(category)
+                        expanded = false
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.onSurface
                     )
-                }
+                )
             }
         }
     }
 }
+

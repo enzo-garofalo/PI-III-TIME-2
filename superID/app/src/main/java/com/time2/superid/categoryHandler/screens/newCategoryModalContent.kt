@@ -1,4 +1,4 @@
-package com.time2.superid.ui.components.bottomModalComponents
+package com.time2.superid.categoryHandler.screens
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -42,10 +42,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
-import com.time2.superid.ui.components.structure.CustomSelectField
+import com.time2.superid.categoryHandler.CategoryManager
+import com.time2.superid.ui.components.category.CategoryIcon
+import com.time2.superid.ui.components.category.IconSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -72,6 +78,8 @@ fun registerCategoryContent(
         missingFields = missingFields,
         onDismiss = { showAlert = false }
     )
+
+    val categoryMan = CategoryManager()
 
     Column(
         modifier = Modifier
@@ -112,9 +120,9 @@ fun registerCategoryContent(
                 .imePadding()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            var icone by remember { mutableStateOf("") }
-            var nome by remember { mutableStateOf("") }
-            var descricao by remember { mutableStateOf("") }
+            var title by remember { mutableStateOf("") }
+            var description by remember { mutableStateOf("") }
+            var selectedIcon by remember { mutableStateOf(CategoryIcon.GENERIC) }
 
             Text(
                 text = "Cadastre uma nova categoria",
@@ -136,26 +144,27 @@ fun registerCategoryContent(
                 verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top)
             ) {
                 CustomTextField(
-                    label = "* Nome:",
+                    label = "* Nome da Categoria:",
                     isSingleLine = true,
-                    value = nome,
-                    onValueChange = { nome = it },
+                    value = title,
+                    onValueChange = { title = it },
                     isPassword = false
                 )
 
-                val icones = mutableListOf<String>("Icon 1", "Icon 2", "Icon3")
-                CustomSelectField(
-                    label = "Icone:",
-                    options = icones,
-                    selectedOption = icone,
-                    onOptionSelected = { icone = it }
+
+
+                IconSelectField(
+                    label = "Ícone da categoria:",
+                    options = CategoryIcon.entries,            // <- all options from the enum
+                    selectedOption = selectedIcon,             // <- currently selected
+                    onOptionSelected = { selectedIcon = it }   // <- update on selection
                 )
 
                 CustomTextField(
                     label = "Descrição:",
                     isSingleLine = false,
-                    value = descricao,
-                    onValueChange = { descricao = it },
+                    value = description,
+                    onValueChange = { description = it },
                     isPassword = false
                 )
             }
@@ -165,13 +174,29 @@ fun registerCategoryContent(
             Button(
                 onClick = {
                     val missing = mutableListOf<String>()
-                    if (nome.isBlank()) missing.add("Nome")
+                    if (title.isBlank()) missing.add("title")
 
                     if (missing.isNotEmpty()) {
                         showAlert = true
                         missingFields = missing
                     } else {
-                        currentModalState("success")
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val success = categoryMan.createCategory(
+                                title = title,
+                                description = description,
+                                iconName = selectedIcon.name
+                            )
+
+                            withContext(Dispatchers.Main) {
+                                if (success) {
+                                    currentModalState("success")
+                                } else {
+                                    println("Erro ao registrar a senha.")
+                                    // Aqui poderia implementar um feedback para o usuário
+                                }
+                            }
+                        }
                     }
                 },
                 shape = RoundedCornerShape(50),

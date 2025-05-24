@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.sp
 import com.time2.superid.passwordHandler.PasswordManager
 
 import com.time2.superid.R
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.CategoryManager
+import com.time2.superid.ui.components.structure.CustomCategorySelectField
 import com.time2.superid.ui.components.structure.CustomSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
@@ -134,7 +137,7 @@ fun registerPasswordContent(
             var username by remember { mutableStateOf("") }
             var passwodTitle by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
-            var category by remember { mutableStateOf("") }
+            var category by remember { mutableStateOf(Category()) }
             var description by remember { mutableStateOf("") }
 
             // Título principal
@@ -149,7 +152,7 @@ fun registerPasswordContent(
 
             // Aviso de campos obrigatórios
             Text(
-                text = "** Campo obrigatório",
+                text = "* Campo obrigatório",
                 color = colorResource(id = R.color.alert_color),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
@@ -190,24 +193,25 @@ fun registerPasswordContent(
                     isPassword = true
                 )
 
-                // Opções de categoria
-                val categorias = listOf(
-                    "Sites Web" to "defaultSitesWeb",
-                    "Aplicativos" to "apps",
-                    "Bancos" to "banks",
-                    "Trabalho" to "work",
-                    "Pessoal" to "personal"
-                )
+                val categoryManager = CategoryManager()
+                val categories = remember { mutableStateOf<List<Category>>(emptyList()) }
+                var selectedCategoryId by remember { mutableStateOf<String?>(null) }
 
-                CustomSelectField(
+                // Construindo options de categorias
+                LaunchedEffect(Unit) {
+                    categories.value = categoryManager.getCategories()
+                    selectedCategoryId = categories.value.firstOrNull()?.id
+                }
+
+                // Exibe o campo de seleção
+                CustomCategorySelectField(
                     label = "* Categoria:",
-                    options = categorias.map { it.first },
-                    selectedOption = categorias.find { it.second == category }?.first ?: "Sites Web",
-                    onOptionSelected = { selectedLabel ->
-                        category = categorias.find { it.first == selectedLabel }?.second ?: "defaultSitesWeb"
+                    options = categories.value,
+                    selectedOption = category,
+                    onOptionSelected = { selected ->
+                        category = selected
                     }
                 )
-
 
                 CustomTextField(
                     label = "Descrição:",
@@ -238,9 +242,10 @@ fun registerPasswordContent(
                             return@Button
                         }
 
+                        val cat = category
                         CoroutineScope(Dispatchers.IO).launch {
                             val success = repository.createPassword(
-                                category = category,
+                                category = cat,
                                 description = description,
                                 partnerSite = "url",
                                 password = password,
@@ -250,6 +255,8 @@ fun registerPasswordContent(
 
                             withContext(Dispatchers.Main) {
                                 if (success) {
+                                    val categoryManager = CategoryManager()
+                                    categoryManager.incrementNumOfPasswords(cat.id)
                                     currentModalState("success")
                                 } else {
                                     println("Erro ao registrar a senha.")

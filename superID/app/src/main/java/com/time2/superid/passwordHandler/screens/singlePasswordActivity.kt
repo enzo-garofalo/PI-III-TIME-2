@@ -16,11 +16,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -33,10 +33,10 @@ import com.time2.learningui_ux.components.buildBottomModal
 import com.time2.learningui_ux.components.buildSinglePasswordHeader
 import com.time2.learningui_ux.components.buildTopAppBar
 import com.time2.learningui_ux.components.elementButton
-import com.time2.superid.accountsHandler.UserAccountsManager
-import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
+import com.time2.superid.accountsHandler.UserAccountsManager
+import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.structure.CustomTextField
@@ -45,12 +45,11 @@ import com.time2.superid.utils.fetchUserProfile
 import kotlinx.coroutines.launch
 
 
-class singlePasswordActivity  : ComponentActivity()
+class SinglePasswordActivity : ComponentActivity()
 {
     private val auth: FirebaseAuth = Firebase.auth
     private val userAccountsManager = UserAccountsManager()
     private val passwordManager = PasswordManager()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +77,6 @@ class singlePasswordActivity  : ComponentActivity()
                 // Isso garante que a senha exibida na tela estará sempre atualizada
                 LaunchedEffect(docId, reloadTrigger) {
                     password = passwordManager.getPasswordById(docId ?: "")
-                    Log.w("Aqui", "$password")
                 }
 
                 Scaffold(
@@ -88,30 +86,30 @@ class singlePasswordActivity  : ComponentActivity()
                             showBackClick = true,
                             onBackClick = {
                                 startActivity(
-                                    Intent(this@singlePasswordActivity, HomeActivity::class.java)
+                                    Intent(this@SinglePasswordActivity, HomeActivity::class.java)
                                 )
                                 finish()
                             },
                             onLogoutClick = {
                                 auth.signOut()
                                 startActivity(
-                                    Intent(this@singlePasswordActivity, LoginActivity::class.java)
+                                    Intent(this@SinglePasswordActivity, LoginActivity::class.java)
                                 )
                                 finish()
                             },
                         )
                     },
                     bottomBar = {}
-                ) { innerPadding ->
-                    Column(Modifier.padding(innerPadding)) {
+                ){ innerPadding ->
+                    Column(Modifier.padding(innerPadding)){
                         if (password != null) {
-                            SinglePasswordContent(
+                            SinglePasswordCompose(
                                 password = password!!,
                                 onDeleteClick = {
                                     coroutineScope.launch {
                                         val deleted = passwordManager.deletePassword(docId.toString())
                                         if (deleted) {
-                                            startActivity(Intent(this@singlePasswordActivity, HomeActivity::class.java))
+                                            startActivity(Intent(this@SinglePasswordActivity, HomeActivity::class.java))
                                             finish()
                                         } else {
                                             Log.e("Delete", "Erro ao deletar senha")
@@ -132,13 +130,13 @@ class singlePasswordActivity  : ComponentActivity()
     }
 }
 
+
 @Composable
-fun SinglePasswordContent(
+fun SinglePasswordCompose(
     password: Password,
     onDeleteClick: () -> Unit,
     onReloadTrigger: () -> Unit
-) {
-
+){
     var showEditModal by remember { mutableStateOf(false) }
 
 
@@ -186,9 +184,9 @@ fun SinglePasswordContent(
             val categ = Element(
                 isPassword = false,
                 id = "",
-                title = password.category,
-                description = null,
-                category = "social"
+                title = password.category.title,
+                description = password.category.description,
+                category = password.category
             )
 
             elementButton(categ)
@@ -232,8 +230,3 @@ fun SinglePasswordContent(
         )
     }
 }
-
-
-
-
-
