@@ -20,26 +20,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.time2.superid.passwordHandler.PasswordManager
-import com.time2.superid.passwordHandler.screens.singlePasswordActivity
-import kotlinx.coroutines.launch
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.passwordHandler.Password
+import com.time2.superid.passwordHandler.screens.SinglePasswordActivity
 
 data class Element(
     val isPassword : Boolean = false,
     val id : String = "",
     val title: String = "",
     val description: String? = null,
-    val category: String
+    val category: Category? = null
 )
 
 @Composable
@@ -79,7 +76,7 @@ fun elementButton(
 
                 if(element.isPassword)
                 {
-                    val intent = Intent(context, singlePasswordActivity::class.java).apply {
+                    val intent = Intent(context, SinglePasswordActivity::class.java).apply {
                         putExtras(bundle)
                     }
                     context.startActivity(intent)
@@ -92,7 +89,8 @@ fun elementButton(
                 .padding(12.dp)
         ) {
             // icon
-            createIcon(element.category, "${element.category} icon")
+            element.category?.let { createIcon(it.iconName, "${element.category.iconName} icon") }
+
 
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -117,34 +115,18 @@ fun elementButton(
 }
 
 @Composable
-fun showPasswordList() {
-    // Create a coroutine scope for launching suspend functions
-    val coroutineScope = rememberCoroutineScope()
-    // State to hold the list of elements
-    val elementsList = remember { mutableStateOf<List<Element>>(emptyList()) }
-
-    // Instance of PasswordRepository
-    val passwordManager = PasswordManager()
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-
-            val passwords = passwordManager.getPasswords()
-
-            val elements = passwords.map { password ->
-                Element(
-                    isPassword = true,
-                    id = password.id,
-                    title = password.passwordTitle,
-                    description = password.description,
-                    category = password.category
-                )
-            }
-
-            elementsList.value = elements
-        }
+fun showPasswordList(
+    passwordList: MutableState<List<Password>>
+) {
+    val elementList = passwordList.value.map { password ->
+        Element(
+            isPassword = true,
+            id = password.id,
+            title = password.passwordTitle,
+            description = password.description,
+            category = password.category
+        )
     }
 
-    // Display the list of elements
-    buildElementsShowCase(elementsList.value)
+    buildElementsShowCase(elementList)
 }

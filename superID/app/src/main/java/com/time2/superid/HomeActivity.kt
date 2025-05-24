@@ -23,6 +23,11 @@ import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import com.time2.learningui_ux.components.buildMyPasswordHeader
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.CategoryManager
+import com.time2.superid.passwordHandler.Password
+import com.time2.superid.passwordHandler.PasswordManager
+import kotlinx.coroutines.launch
 
 class HomeActivity : ComponentActivity() {
 
@@ -34,16 +39,38 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SuperIDTheme {
+                val coroutineScope = rememberCoroutineScope()
                 var showModal by remember { mutableStateOf(false) }
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
 
+                val passwordManager = PasswordManager()
+                val userPassworsList = remember { mutableStateOf<List<Password>>(emptyList()) }
+                val reloadPasswords : () -> Unit = {
+                    coroutineScope.launch {
+                        val passwordList = passwordManager.getPasswords()
+                        userPassworsList.value = passwordList
+                    }
+                }
 
-                LaunchedEffect(key1 = Unit) {
+                val categoryManager = CategoryManager()
+                val userCategoryList = remember { mutableStateOf<List<Category>>(emptyList()) }
+                val reloadCategories: () -> Unit = {
+                    coroutineScope.launch {
+                        val categoryList = categoryManager.getCategories()
+                        userCategoryList.value = categoryList
+                    }
+                }
+
+                // Carregamento Inicial
+                LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
                         userName = name
                         isLoading = false
                     }
+
+                    reloadPasswords()
+                    reloadCategories()
                 }
 
                 Scaffold(
@@ -76,19 +103,27 @@ class HomeActivity : ComponentActivity() {
                             onSettingsClick = {/*TODO*/}
                         )
 
-                        showCategoryElements()
+
+
+
+                        // Show the categories
+                        showCategoryElements(categoryList = userCategoryList.value)
 
                         buildMyPasswordHeader(
                             onAllFilterClick = {/*TODO*/},
                             onRecentClick = {/*TODO*/}
                         )
 
-                        showPasswordList()
+                        showPasswordList(userPassworsList)
                     }
 
                     if (showModal) {
                         buildBottomModal(
-                            onDismiss = { showModal = false },
+                            onDismiss = {
+                                showModal = false
+                                reloadCategories()
+                                reloadPasswords()
+                            },
                             currentModal = "menu"
                         )
                     }

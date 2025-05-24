@@ -74,7 +74,15 @@
         <!-- Activity de single password -->
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".passwordHandler.screens.singlePasswordActivity"
+            android:name=".passwordHandler.screens.SinglePasswordActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SuperID"/>
+
+        <!-- Activity de List password bby category-->
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".passwordHandler.screens.PasswordsByCategoryActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"/>

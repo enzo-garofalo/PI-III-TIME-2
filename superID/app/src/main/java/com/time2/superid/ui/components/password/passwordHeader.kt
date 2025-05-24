@@ -92,7 +92,7 @@ fun buildSinglePasswordHeader(
     ) {
         Column {
             Text(
-                text = "Sua conta para:",
+                text = "Sua senha para:",
                 style = TextStyle(
                     fontSize = 18.sp,
                     fontFamily = FontFamily(Font(R.font.urbanist_regular))

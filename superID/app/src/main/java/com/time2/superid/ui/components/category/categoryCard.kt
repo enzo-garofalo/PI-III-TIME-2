@@ -1,11 +1,14 @@
 package com.time2.learningui_ux.components
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,19 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.time2.superid.ui.components.utils.getCategoryIcon
-
-
-data class userCategory(
-    var iconName: String = "",
-    var title: String = "",
-    var searchFor : () -> Unit,
-    var numOfpasswords : Int? = null
-)
-
-
-
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import com.time2.superid.HomeActivity
+import com.time2.superid.categoryHandler.Category
+import com.time2.superid.passwordHandler.screens.PasswordsByCategoryActivity
+import com.time2.superid.passwordHandler.screens.SinglePasswordActivity
+import com.time2.superid.ui.components.category.getCategoryIcon
 
 @Composable
 fun createIcon(
@@ -62,8 +63,10 @@ fun createIcon(
 
 @Composable
 fun buildCategoryCases(
-    categoryList: List<userCategory>
+    categoryList: List<Category>
 ) {
+    val context = LocalContext.current
+
     LazyRow(
         modifier = Modifier
             .padding(horizontal = 8.dp),
@@ -73,10 +76,21 @@ fun buildCategoryCases(
         itemsIndexed(categoryList) {index, item ->
             Box(
                 modifier = Modifier
-                    .shadow(elevation = 1.dp, shape = RoundedCornerShape(12.dp))
+                    .size(width = 100.dp, height = 128.dp)
+                    .shadow(elevation = 1.dp, shape = RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White)
-                    .clickable { item.searchFor() }
+                    .clickable {
+
+                        val bundle = Bundle().apply {
+                            putString("categoryID", item.id)
+                        }
+
+                        val intent = Intent(context, PasswordsByCategoryActivity::class.java).apply {
+                            putExtras(bundle)
+                        }
+                        context.startActivity(intent)
+                    }
                     .padding(12.dp)
             ){
                 // Mini Card
@@ -84,19 +98,31 @@ fun buildCategoryCases(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
 
-                    createIcon(item.iconName, item.title)
+                     createIcon(item.iconName, item.title)
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Black
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 14.sp),
+                        color = Color.Black,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
 
+                    val count = item.numOfPasswords
+                    val senhaText = when (count) {
+                        0 -> "Nenhuma senha"
+                        1 -> "1 senha"
+                        else -> "$count senhas"
+                    }
+
                     Text(
-                        text = "${item.numOfpasswords} senhas",
+
+                        text = senhaText,
                         style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
                         color = Color.Gray
                     )
                 }
@@ -107,28 +133,9 @@ fun buildCategoryCases(
 
 
 @Composable
-fun showCategoryElements()
-{
-    val categoryList = listOf<userCategory>(
-        userCategory(
-            iconName = "bank",
-            title = "Banco",
-            searchFor = {/*TODO*/},
-            numOfpasswords = 4
-        ),
-        userCategory(
-            iconName = "social",
-            title = "Social",
-            searchFor = {/*TODO*/},
-            numOfpasswords = 0
-        ),
-        userCategory(
-            iconName = "pinpad",
-            title = "pinpad",
-            searchFor = {/*TODO*/},
-            numOfpasswords = 4
-        ),
-    )
+fun showCategoryElements(
+    categoryList: List<Category>
+) {
 
     buildCategoryCases(categoryList)
 }
