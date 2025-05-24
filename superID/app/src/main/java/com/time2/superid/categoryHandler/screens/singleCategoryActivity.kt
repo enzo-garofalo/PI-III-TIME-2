@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -23,10 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,21 +36,19 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.time2.learningui_ux.components.Element
 import com.time2.learningui_ux.components.buildBottomModal
 import com.time2.learningui_ux.components.buildSingleCategoryHeader
 import com.time2.learningui_ux.components.buildTopAppBar
-import com.time2.learningui_ux.components.elementButton
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
+import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.category.CategoryIcon
 import com.time2.superid.ui.components.category.IconSelectField
-import com.time2.superid.ui.components.structure.CustomCategorySelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
@@ -68,14 +65,23 @@ class SingleCategoryActivity : ComponentActivity()
         super.onCreate(savedInstanceState)
         setContent {
             SuperIDTheme {
-//                val coroutineScope = rememberCoroutineScope()
+                val coroutineScope = rememberCoroutineScope()
+                var reloadTrigger by remember { mutableStateOf(false) }
+                val categoryId = intent.getStringExtra("categoryId")
 
                 var category by remember { mutableStateOf<Category?>(null) }
-                val categoryId = intent.getStringExtra("categoryId")
+                LaunchedEffect(categoryId, reloadTrigger) {
+                    category = catMan.getCategoryById(categoryId ?: "")
+                }
+
 
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
-                var reloadTrigger by remember { mutableStateOf(false) }
+
+                var showAlert by remember { mutableStateOf(false) }
+                var categoryPasswordList by remember { mutableStateOf<List<Password>>(emptyList()) }
+
+
 
                 LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
@@ -84,9 +90,6 @@ class SingleCategoryActivity : ComponentActivity()
                     }
                 }
 
-                LaunchedEffect(categoryId, reloadTrigger) {
-                    category = catMan.getCategoryById(categoryId ?: "")
-                }
 
                 Scaffold(
                     topBar = {
@@ -115,19 +118,48 @@ class SingleCategoryActivity : ComponentActivity()
                     bottomBar = {}
                 ){ innerPadding ->
                     Column(Modifier.padding(innerPadding)){
-                        if (category != null) {
+                        if (category != null && categoryId != null) {
                             SingleCategoryCompose(
                                 category = category!!,
                                 onDeleteClick = {
-                                    /*TODO*/
+                                    coroutineScope.launch {
+                                        if (category!!.numOfPasswords > 0) {
+
+                                            val passMan = PasswordManager()
+                                            categoryPasswordList =
+                                                passMan.getPasswordsByCategoryID(categoryId)
+                                            showAlert = true
+                                        }else{
+                                            // TODO: modal bonito antes de deletar categoria
+                                            val deleted = catMan.deleteCategory(categoryId)
+                                            if (deleted) {
+                                                startActivity(Intent(
+                                                    this@SingleCategoryActivity,
+                                                    HomeActivity::class.java))
+                                                finish()
+                                            } else {
+                                                Log.e("Delete", "Erro ao deletar categoria")
+                                            }
+                                        }
+                                    }
                                 },
                                 onReloadTrigger = {
                                     reloadTrigger = !reloadTrigger
                                 }
                             )
+
                         } else {
                             Text("Carregando Categoria...")
                         }
+                    }
+
+                    if(showAlert)
+                    {
+                        buildBottomModal(
+                            onDismiss = { showAlert = false },
+                            currentModal = "failureToDelete",
+                            category = category
+                        )
                     }
                 }
             }
@@ -172,8 +204,8 @@ fun SingleCategoryCompose(
                 }
 
                 Text(
-                    text = "Você tem  $senhaText  nessa categoria.",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Você tem $senhaText nessa categoria.",
+                    style = MaterialTheme.typography.titleSmall,
                     textAlign = TextAlign.Center,
                     color = Color.Gray
                 )

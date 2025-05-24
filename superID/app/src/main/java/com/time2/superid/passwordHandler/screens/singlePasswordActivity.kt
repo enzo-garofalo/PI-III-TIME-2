@@ -109,6 +109,7 @@ class SinglePasswordActivity : ComponentActivity()
                                 password = password!!,
                                 onDeleteClick = {
                                     coroutineScope.launch {
+                                        // TODO: modal bonito antes de deletar categoria
                                         val deleted = passwordManager.deletePassword(docId.toString())
                                         if (deleted) {
                                             startActivity(Intent(this@SinglePasswordActivity, HomeActivity::class.java))
