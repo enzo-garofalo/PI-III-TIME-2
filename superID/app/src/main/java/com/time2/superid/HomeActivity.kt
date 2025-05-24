@@ -103,9 +103,6 @@ class HomeActivity : ComponentActivity() {
                             onSettingsClick = {/*TODO*/}
                         )
 
-
-
-
                         // Show the categories
                         showCategoryElements(categoryList = userCategoryList.value)
 
@@ -113,7 +110,6 @@ class HomeActivity : ComponentActivity() {
                             onAllFilterClick = {/*TODO*/},
                             onRecentClick = {/*TODO*/}
                         )
-
                         showPasswordList(userPassworsList)
                     }
 

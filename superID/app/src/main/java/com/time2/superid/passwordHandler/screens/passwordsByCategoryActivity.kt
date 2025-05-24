@@ -52,7 +52,7 @@ class PasswordsByCategoryActivity : ComponentActivity()
                 }
 
                 val catMan = CategoryManager()
-                val categoryId = intent.getStringExtra("categoryId")
+                val categoryId = intent.getStringExtra("categoryID")
 
                 if (categoryId.isNullOrEmpty()) {
                     Log.e("PasswordsByCategory", "categoryId é nulo! Encerrando activity. ${categoryId}")

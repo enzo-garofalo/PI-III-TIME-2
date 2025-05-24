@@ -7,15 +7,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.time2.superid.utils.AESEncryption
 import kotlinx.coroutines.tasks.await
 import android.util.Log
-import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
-import com.time2.superid.ui.components.category.CategoryIcon
 import java.security.SecureRandom
 
 data class Password(
     val id: String = "",
     val accessToken: String = "",
-    val category: Category = Category(),
+    val categoryId:  String = "",
     val description: String = "",
     val partnerSite: String = "",
     val password: String = "",
@@ -57,7 +55,7 @@ class PasswordManager {
      * Cria uma nova senha na coleção do usuário autenticado.
      */
     suspend fun createPassword(
-        category: Category = Category(),
+        categoryId:  String = "",
         description: String = "",
         partnerSite: String = "",
         password: String = "",
@@ -81,7 +79,7 @@ class PasswordManager {
 
             // Criar objeto de senha com valores atualizados
             val newPassword = Password(
-                category = category,
+                categoryId = categoryId,
                 accessToken = accessToken,
                 description = description,
                 partnerSite = partnerSite,
@@ -115,31 +113,16 @@ class PasswordManager {
             val snapshot = collection.get().await()
             snapshot.documents.mapNotNull { doc ->
                 val data = doc.data ?: return@mapNotNull null
-
-                // Category Map me permite
-                val categoryMap = data["category"] as? Map<*, *>
-                val category = categoryMap?.let {
-                    Category(
-                        id = it["id"] as? String ?: "",
-                        title = it["title"] as? String ?: "",
-                        description = it["description"] as? String ?: "",
-                        iconName = it["iconName"] as? String ?: CategoryIcon.GENERIC.name,
-                        isDefault = it["isDefault"] as? Boolean ?: false,
-                        isDeletable = it["isDeletable"] as? Boolean ?: false,
-                        createdAt = it["createdAt"] as? Timestamp ?: Timestamp.now(),
-                        numOfPasswords = (it["numOfPasswords"] as? Long)?.toInt() ?: 0 // Firestore stores integers as Long
-                    )
-                } ?: Category() // Fallback to default Category if null or invalid
                 Password(
                     id = data["id"] as? String ?: doc.id,
-                    category = category,
+                    categoryId  = data["categoryId"] as? String ?: "",
                     partnerSite = data["partnerSite"] as? String ?: "",
                     username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
                     passwordTitle = data["passwordTitle"] as? String ?: "",
-                    accessToken = data["accessToken"] as? String ?: "",
-                    description = data["description"] as? String ?: "",
-                    createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
+                    accessToken   = data["accessToken"] as? String ?: "",
+                    description   = data["description"] as? String ?: "",
+                    createdAt   = data["createdAt"] as? Timestamp ?: Timestamp.now(),
                     lastUpdated = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
                 )
             }
@@ -148,6 +131,39 @@ class PasswordManager {
             emptyList()
         }
     }
+
+    /*
+    * Buscando senhas por categoryID
+    */
+    suspend fun getPasswordsByCategoryID(categoryId : String) : List<Password>{
+        val collection = getPasswordsCollection() ?: return emptyList()
+        return try {
+            collection
+                .whereEqualTo("categoryId", categoryId)
+                .get().await()
+                .documents
+                .mapNotNull { doc ->
+                    val data = doc.data ?: return@mapNotNull null
+                    Password(
+                        id            = data["id"] as? String ?: doc.id,
+                        categoryId    = data["categoryID"] as? String ?: "",
+                        partnerSite   = data["partnerSite"] as? String ?: "",
+                        username      = data["username"] as? String ?: "",
+                        password      = data["password"] as? String ?: "",
+                        passwordTitle = data["passwordTitle"] as? String ?: "",
+                        accessToken   = data["accessToken"] as? String ?: "",
+                        description   = data["description"] as? String ?: "",
+                        createdAt     = data["createdAt"] as? Timestamp ?: Timestamp.now(),
+                        lastUpdated   = data["lastUpdated"] as? Timestamp ?: Timestamp.now()
+                    )
+                }
+        } catch (e: Exception) {
+            Log.e("PasswordManager", "Erro ao buscar por categoria: ${e.message}")
+            emptyList()
+        }
+    }
+
+
 
     /**
      * Busca uma senha pelo ID.
@@ -158,23 +174,9 @@ class PasswordManager {
             val docSnapshot = collection.document(passwordId).get().await()
             if (docSnapshot.exists()) {
                 val data = docSnapshot.data ?: return null
-                // Manually deserialize the category field
-                val categoryMap = data["category"] as? Map<*, *>
-                val category = categoryMap?.let {
-                    Category(
-                        id = it["id"] as? String ?: "",
-                        title = it["title"] as? String ?: "",
-                        description = it["description"] as? String ?: "",
-                        iconName = it["iconName"] as? String ?: CategoryIcon.GENERIC.name,
-                        isDefault = it["isDefault"] as? Boolean ?: false,
-                        isDeletable = it["isDeletable"] as? Boolean ?: false,
-                        createdAt = it["createdAt"] as? Timestamp ?: Timestamp.now(),
-                        numOfPasswords = (it["numOfPasswords"] as? Long)?.toInt() ?: 0 // Firestore stores integers as Long
-                    )
-                } ?: Category() // Fallback to default Category if null or invalid
                 Password(
                     id = passwordId,
-                    category = category,
+                    categoryId  = data["categoryId"] as? String ?: "",
                     partnerSite = data["partnerSite"] as? String ?: "",
                     username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
@@ -202,7 +204,7 @@ class PasswordManager {
         newPassword: String? = null,
         newDescription: String? = null,
         newPasswordTitle: String? = null,
-        newCategory: Category? = null,
+        newCategory: String? = null,
         newPartnerSite: String? = null
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false
@@ -214,11 +216,11 @@ class PasswordManager {
                 return false
             }
 
-            if(newCategory != password.category && newCategory != null){
+            // Modificando numero de senhas da categoria
+            if(newCategory != password.categoryId && newCategory != null){
                 val catMan = CategoryManager()
-                catMan.decrementNumOfPasswords(password.category.id)
-
-                catMan.incrementNumOfPasswords(newCategory.id)
+                catMan.decrementNumOfPasswords(password.categoryId)
+                catMan.incrementNumOfPasswords(newCategory)
             }
 
             // Atualiza campos fornecidos, mantém os antigos caso não sejam informados
@@ -226,7 +228,7 @@ class PasswordManager {
                 username = newUsername ?: password.username,
                 description = newDescription ?: password.description,
                 passwordTitle = newPasswordTitle ?: password.passwordTitle,
-                category = newCategory ?: password.category,
+                categoryId = newCategory ?: password.categoryId,
                 partnerSite = newPartnerSite ?: password.partnerSite,
                 accessToken = refreshAccessToken(password.id).toString(),
                 lastUpdated = Timestamp.now()
@@ -280,7 +282,7 @@ class PasswordManager {
         return try {
             val currentPassword = getPasswordById(passwordId)
             val catMan = CategoryManager()
-            catMan.decrementNumOfPasswords(currentPassword!!.category.id)
+            catMan.decrementNumOfPasswords(currentPassword!!.categoryId)
 
             collection.document(passwordId).delete().await()
             true

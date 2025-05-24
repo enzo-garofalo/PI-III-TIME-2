@@ -242,10 +242,10 @@ fun registerPasswordContent(
                             return@Button
                         }
 
-                        val cat = category
+
                         CoroutineScope(Dispatchers.IO).launch {
                             val success = repository.createPassword(
-                                category = cat,
+                                categoryId = category.id,
                                 description = description,
                                 partnerSite = "url",
                                 password = password,
@@ -256,7 +256,7 @@ fun registerPasswordContent(
                             withContext(Dispatchers.Main) {
                                 if (success) {
                                     val categoryManager = CategoryManager()
-                                    categoryManager.incrementNumOfPasswords(cat.id)
+                                    categoryManager.incrementNumOfPasswords(category.id)
                                     currentModalState("success")
                                 } else {
                                     println("Erro ao registrar a senha.")

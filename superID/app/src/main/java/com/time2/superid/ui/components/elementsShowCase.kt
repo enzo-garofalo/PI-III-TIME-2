@@ -20,7 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -28,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.screens.SinglePasswordActivity
 
@@ -118,13 +124,23 @@ fun elementButton(
 fun showPasswordList(
     passwordList: MutableState<List<Password>>
 ) {
+    val categoryManager = CategoryManager()
+    val categories = remember { mutableStateOf<List<Category>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        categories.value = categoryManager.getCategories()
+    }
+
+    val categoriesMap = categories.value.associateBy { it.id }
+
     val elementList = passwordList.value.map { password ->
+        val category = categoriesMap[password.categoryId] ?: Category()
         Element(
             isPassword = true,
             id = password.id,
             title = password.passwordTitle,
             description = password.description,
-            category = password.category
+            category = category
         )
     }
 
