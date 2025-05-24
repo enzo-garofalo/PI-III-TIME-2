@@ -108,8 +108,9 @@ class CategoryManager {
      * Atualiza uma categoria existente na coleção do usuário.
      */
     suspend fun updateCategory(
-        category: Category,
-        newTitle: String? = null,
+        category : Category,
+        newIcon  : String? = null,
+        newTitle : String? = null,
         newDescription: String? = null,
     ): Boolean {
         val collection = getCategoryCollection() ?: return false.also {
@@ -125,7 +126,8 @@ class CategoryManager {
             // Atualiza campos fornecidos, mantém os antigos caso não sejam informados
             val updatedCategory = category.copy(
                 title = newTitle ?: category.title,
-                description = newDescription ?: category.description
+                description = newDescription ?: category.description,
+                iconName = newIcon ?: category.iconName
             )
 
             collection.document(category.id).set(updatedCategory).await()
