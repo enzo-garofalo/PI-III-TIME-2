@@ -87,6 +87,14 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"/>
 
+        <!-- Activity de Single Category Activity-->
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".categoryHandler.screens.SingleCategoryActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SuperID"/>
+
     </application>
 
 </manifest>

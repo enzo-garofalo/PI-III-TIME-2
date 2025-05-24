@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.time2.superid.categoryHandler.Category
 import com.time2.superid.passwordHandler.screens.editPasswordContent
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
@@ -22,7 +23,8 @@ import com.time2.superid.ui.components.bottomModalComponents.successContent
 fun buildBottomModal(
     onDismiss : () -> Unit,
     currentModal : String,
-    password : Password? = null
+    password : Password? = null,
+    category : Category? = null
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -64,6 +66,7 @@ fun buildBottomModal(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss
             )
+
             "success" -> successContent(
                 onClose = onDismiss
             )
