@@ -11,6 +11,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.superid.HomeActivity
 import com.time2.superid.accountsHandler.UserAccountsManager
+import com.time2.superid.accountsHandler.screens.EmailValidationActivity
 
 fun getDeviceID(context: Context) : String
 {
@@ -35,15 +36,17 @@ fun getDeviceID(context: Context) : String
 //}
 
 
-fun redirectIfLogged(activity: ComponentActivity, TAG: String): Boolean {
-    val auth = Firebase.auth
+fun redirectIfLogged(activity: ComponentActivity): Boolean {
+    val auth = FirebaseAuth.getInstance()
+    val userAccountsManager = UserAccountsManager()
 
     if (auth.currentUser != null) {
-        Log.i(TAG, "Usuário já logado: ${auth.currentUser?.uid}")
-        val intent = Intent(activity, HomeActivity::class.java)
-        activity.startActivity(intent)
-        activity.finish()
-        return true
+        userAccountsManager.checkEmailVerification { isVerified ->
+            if (isVerified) {
+                activity.startActivity(Intent(activity, HomeActivity::class.java))
+                activity.finish()
+            }
+        }
     }
     return false
 }

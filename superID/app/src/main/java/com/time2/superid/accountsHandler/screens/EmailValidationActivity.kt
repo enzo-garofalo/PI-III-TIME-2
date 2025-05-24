@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.ui.theme.SuperIDTheme
 
-class EmailValidationActivity : ComponentActivity()  {
+class EmailValidationActivity : ComponentActivity()
+{
     private val  userAccountsManager = UserAccountsManager()
     private val auth = Firebase.auth
     private val user = auth.currentUser
@@ -68,10 +68,10 @@ class EmailValidationActivity : ComponentActivity()  {
         }
 
         window.statusBarColor = android.graphics.Color.BLACK
-        enableEdgeToEdge()
+
         setContent{
             SuperIDTheme {
-                EmailValidationCompose()
+                EmailValidationCompose(userAccountsManager)
             }
         }
     }
@@ -79,17 +79,17 @@ class EmailValidationActivity : ComponentActivity()  {
 
 
 @Composable
-fun EmailValidationCompose() {
-    EmailValidationView()
+fun EmailValidationCompose(userAccountsManager: UserAccountsManager) {
+    EmailValidationView(userAccountsManager)
 }
 
 @Composable
-fun EmailValidationView(modifier: Modifier = Modifier)
+fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modifier = Modifier)
 {
     val isResendEnabled by remember { mutableStateOf(true) }
-    val countdownSeconds by remember { mutableStateOf(0) }
+    var countdownSeconds by remember { mutableStateOf(1) }
     val context = LocalContext.current
-    val isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -141,15 +141,24 @@ fun EmailValidationView(modifier: Modifier = Modifier)
         // Botão de verificacao
         Button(
             onClick = {
-                context.startActivity(Intent(context, LoginActivity::class.java))
+                userAccountsManager.checkEmailVerification { isVerified ->
+
+                    if (isVerified) {
+                        showShortToast(context, "Bem vindo ao SuperID")
+                        context.startActivity(Intent(context, HomeActivity::class.java))
+                        (context as? EmailValidationActivity)?.finish()
+                    } else {
+                        showShortToast(context, "Email não foi verificado!")
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .width(331.dp)
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4500C9),
-                disabledContainerColor = Color(0xFF4500C9).copy(alpha = 0.5f),
+                containerColor = Color(0xFF6A707C),
+                disabledContainerColor = Color(0xFF6A707C).copy(alpha = 0.5f),
                 contentColor = Color.White,
                 disabledContentColor = Color.White.copy(alpha = 0.5f)
             ),
@@ -163,7 +172,7 @@ fun EmailValidationView(modifier: Modifier = Modifier)
                 )
             } else {
                 Text(
-                    text = "Ir para o login",
+                    text = "Já verifiquei meu email",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontFamily = FontFamily(Font(R.font.urbanist)),
@@ -175,6 +184,41 @@ fun EmailValidationView(modifier: Modifier = Modifier)
             }
         }
 
+        // Espaçamento entre os botões
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Novo botão "Voltar"
+        Button(
+            onClick = {
+                // Fecha a activity atual e retorna à anterior
+                context.startActivity(Intent(context, LoginActivity::class.java))
+                (context as? EmailValidationActivity)?.finish()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(331.dp)
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF4500C9), // Cor diferente para distinguir do botão principal
+                disabledContainerColor = Color(0xFF4500C9).copy(alpha = 0.5f),
+                contentColor = Color.White,
+                disabledContentColor = Color.White.copy(alpha = 0.5f)
+            ),
+            shape = RoundedCornerShape(size = 80.dp),
+            enabled = !isLoading
+        ) {
+            Text(
+                text = "Voltar",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(600),
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+            )
+        }
+
         if (!isResendEnabled && countdownSeconds > 0) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -182,5 +226,13 @@ fun EmailValidationView(modifier: Modifier = Modifier)
                 fontSize = 14.sp
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewEmailValidationScreen() {
+    SuperIDTheme {
+        EmailValidationView(UserAccountsManager())
     }
 }

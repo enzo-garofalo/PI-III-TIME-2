@@ -46,7 +46,7 @@ class SignUpActivity : ComponentActivity()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        if (redirectIfLogged(this, TAG)) return
+        if (redirectIfLogged(this)) return
 
         setContent{
             SuperIDTheme {

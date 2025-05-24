@@ -49,7 +49,7 @@ class UserAccountsManager {
             }
             .addOnFailureListener { e ->
                 Log.e("CreateAccount", "Falha ao criar conta", e)
-                showShortToast(context, "Verifique o email e senha")
+                showShortToast(context, "Usuário existe, verifique seu email!")
             }
     }
 
@@ -64,7 +64,6 @@ class UserAccountsManager {
                 callback(isVerified)
             }
             ?.addOnFailureListener { e ->
-                Log.e("EmailVerification", "Error reloading user", e)
                 callback(false)
             }
     }
