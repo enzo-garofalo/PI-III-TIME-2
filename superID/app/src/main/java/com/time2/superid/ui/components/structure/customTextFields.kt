@@ -96,6 +96,7 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean = false,
+    enabled : Boolean = true
 ) {
 
     // Variáveis de cor
@@ -107,6 +108,7 @@ fun CustomTextField(
 
     OutlinedTextField(
         value = value,
+        enabled = enabled,
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +177,7 @@ fun CustomSelectField(
     label: String,
     options: List<String>,
     selectedOption: String,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
 ) {
     // Variáveis de cor
     val border     = colorResource(id = R.color.border_color)
@@ -192,7 +194,6 @@ fun CustomSelectField(
             value         = selectedOption,
             onValueChange = { /* read-only */ },
             readOnly      = true,
-            enabled       = true,
             label         = {
                 Surface(color = background) {
                     Text(
@@ -261,7 +262,8 @@ fun CustomCategorySelectField(
     label: String,
     options: List<Category>,
     selectedOption: Category?,
-    onOptionSelected: (Category) -> Unit
+    onOptionSelected: (Category) -> Unit,
+    enabled: Boolean = true
 ) {
     val border = colorResource(id = R.color.border_color)
     val background = MaterialTheme.colorScheme.onTertiary
@@ -270,11 +272,12 @@ fun CustomCategorySelectField(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it }
+        onExpandedChange = { if (enabled) expanded = it }
     ) {
         OutlinedTextField(
             value = selectedOption?.title ?: "",
             onValueChange = {},
+            enabled = enabled,
             readOnly = true,
             label = {
                 Surface(color = background) {

@@ -146,7 +146,7 @@ class PasswordManager {
                     val data = doc.data ?: return@mapNotNull null
                     Password(
                         id            = data["id"] as? String ?: doc.id,
-                        categoryId    = data["categoryID"] as? String ?: "",
+                        categoryId    = data["categoryId"] as? String ?: "",
                         partnerSite   = data["partnerSite"] as? String ?: "",
                         username      = data["username"] as? String ?: "",
                         password      = data["password"] as? String ?: "",

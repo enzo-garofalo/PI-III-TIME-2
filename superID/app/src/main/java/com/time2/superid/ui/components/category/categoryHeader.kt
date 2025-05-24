@@ -1,5 +1,6 @@
 package com.time2.learningui_ux.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
 import com.time2.superid.categoryHandler.Category
-import com.time2.superid.ui.components.category.getCategoryIcon
 
 @Composable
 fun buildCategoryHeader(
@@ -63,8 +63,9 @@ fun buildCategoryHeader(
 }
 
 @Composable
-fun buildSingleCategoryHeader(
-    category: Category
+fun buildPasswordsByCategoryHeader(
+    category: Category,
+    onSettingsClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -122,7 +123,7 @@ fun buildSingleCategoryHeader(
             }
 
             IconButton(
-                onClick = { /*TODO*/ }
+                onClick = { onSettingsClick() }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_settings),
@@ -131,5 +132,60 @@ fun buildSingleCategoryHeader(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun buildSingleCategoryHeader(
+    onDeleteClick : () -> Unit,
+    title : String,
+    iconName : String
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                text = "Sua categoria de senha:",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist_regular))
+                ),
+                color = Color.Gray
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Row  {
+
+                createIcon(
+                    iconName = iconName,
+                    iconTitle = "$iconName Title"
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                Text(
+                    text = title,
+                    style = TextStyle(
+                        fontSize = 40.sp,
+                        fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                    ),
+                    color = Color.Black
+                )
+            }
+        }
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_trash),
+            contentDescription = "Deletar ${title}",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .clickable { onDeleteClick() }
+                .padding(start = 16.dp)
+        )
     }
 }
