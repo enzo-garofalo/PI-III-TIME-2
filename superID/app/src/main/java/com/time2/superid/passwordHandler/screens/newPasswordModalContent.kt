@@ -237,20 +237,18 @@ fun registerPasswordContent(
                     } else {
                         val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
                         if (user == null) {
-                            // Aqui você pode mostrar uma mensagem de erro
                             println("Usuário não autenticado.")
                             return@Button
                         }
 
-
                         CoroutineScope(Dispatchers.IO).launch {
                             val success = repository.createPassword(
+                                passwordTitle = passwodTitle,
+                                partnerSite = "www.superidweb.com.br",
+                                username = username,
+                                password = password,
                                 categoryId = category.id,
                                 description = description,
-                                partnerSite = "url",
-                                password = password,
-                                passwordTitle = passwodTitle,
-                                username = username
                             )
 
                             withContext(Dispatchers.Main) {
@@ -260,7 +258,6 @@ fun registerPasswordContent(
                                     currentModalState("success")
                                 } else {
                                     println("Erro ao registrar a senha.")
-                                    // Aqui poderia implementar um feedback para o usuário
                                 }
                             }
                         }

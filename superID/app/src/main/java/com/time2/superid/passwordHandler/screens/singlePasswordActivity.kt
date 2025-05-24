@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -38,10 +38,12 @@ import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
+import com.time2.superid.accountsHandler.screens.SignUpActivity
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.qrCodeHandler.screens.qrCodeScanActivity
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
@@ -56,7 +58,6 @@ class SinglePasswordActivity : ComponentActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SuperIDTheme {
                 val coroutineScope = rememberCoroutineScope()
@@ -143,7 +144,7 @@ fun SinglePasswordCompose(
     onReloadTrigger: () -> Unit
 ){
     var showEditModal by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
 
     Column{
         buildSinglePasswordHeader(
@@ -207,7 +208,7 @@ fun SinglePasswordCompose(
             elementButton(categ)
 
             Button(
-                onClick = { /*todo*/ },
+                onClick = { context.startActivity(Intent(context, qrCodeScanActivity::class.java)) },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()

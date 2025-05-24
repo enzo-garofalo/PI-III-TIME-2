@@ -8,17 +8,19 @@ import com.time2.superid.utils.AESEncryption
 import kotlinx.coroutines.tasks.await
 import android.util.Log
 import com.time2.superid.categoryHandler.CategoryManager
+import com.time2.superid.utils.TokenUtils
 import java.security.SecureRandom
 
 data class Password(
     val id: String = "",
-    val accessToken: String = "",
+    val passwordTitle: String = "",
+    val partnerSite: String = "",
+    val username: String = "",
+    val password: String = "",
     val categoryId:  String = "",
     val description: String = "",
-    val partnerSite: String = "",
-    val password: String = "",
-    val passwordTitle: String = "",
-    val username: String = "",
+    val accessToken: String = "",
+    val type: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val lastUpdated: Timestamp = Timestamp.now()
 )
@@ -41,26 +43,21 @@ class PasswordManager {
             .collection("passwords")
     }
 
-    /**
-     * Gera um token de acesso em Base64 de 256 caracteres
-     */
-    private fun generateAccessToken(): String {
-        val random = SecureRandom()
-        val bytes = ByteArray(192)
-        random.nextBytes(bytes)
-        return Base64.encodeToString(bytes, Base64.NO_WRAP)
-    }
 
     /**
      * Cria uma nova senha na coleção do usuário autenticado.
      */
     suspend fun createPassword(
+        passwordTitle: String = "",
+        partnerSite: String = "",
+        username: String = "",
+        password: String = "",
         categoryId:  String = "",
         description: String = "",
-        partnerSite: String = "",
-        password: String = "",
-        passwordTitle: String = "",
-        username: String = ""
+        // accessToken: String = "", // Gerado aqui na function
+        type: String = "web"
+        // createdAt: Timestamp,
+        // lastUpdated: Timestamp
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false.also {
             Log.e("PasswordManager", "Usuário não autenticado ao criar senha")
@@ -68,7 +65,7 @@ class PasswordManager {
 
         return try {
             // Gerar token de acesso
-            val accessToken = generateAccessToken()
+            val accessToken = TokenUtils.generateAccessToken()
 
             // Criptografar a senha
             val encryptedPassword = if (password.isNotEmpty()) {
@@ -79,16 +76,16 @@ class PasswordManager {
 
             // Criar objeto de senha com valores atualizados
             val newPassword = Password(
-                categoryId = categoryId,
-                accessToken = accessToken,
-                description = description,
-                partnerSite = partnerSite,
-                password = encryptedPassword,
                 passwordTitle = passwordTitle,
+                partnerSite = partnerSite,
                 username = username,
+                password = encryptedPassword,
+                categoryId = categoryId,
+                description = description,
+                accessToken = accessToken,
+                type = "web",
                 createdAt = Timestamp.now(),
                 lastUpdated = Timestamp.now()
-
             )
 
             // Adicionar ao Firestore
@@ -260,7 +257,7 @@ class PasswordManager {
         val collection = getPasswordsCollection() ?: return false
 
         return try {
-            val newAccessToken = generateAccessToken()
+            val newAccessToken = TokenUtils.generateAccessToken()
             collection.document(passwordId).update(
                 mapOf(
                     "accessToken" to newAccessToken,
