@@ -49,6 +49,8 @@ import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.ui.components.category.CategoryIcon
+import com.time2.superid.ui.components.category.IconSelectField
 import com.time2.superid.ui.components.structure.CustomCategorySelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.theme.SuperIDTheme
@@ -185,10 +187,10 @@ fun SingleCategoryCompose(
                     enabled = false
                 )
 
-                CustomCategorySelectField(
+                IconSelectField(
                     label = "Seu ícone de categoria",
                     options = emptyList(),
-                    selectedOption = category,
+                    selectedOption = CategoryIcon.valueOf(category.iconName.uppercase()),
                     onOptionSelected = {},
                     enabled = false
                 )
@@ -232,7 +234,7 @@ fun SingleCategoryCompose(
                 showEditModal = false
                 onReloadTrigger()
             },
-            currentModal = "editPassword",
+            currentModal = "editCategory",
             category = category
         )
     }

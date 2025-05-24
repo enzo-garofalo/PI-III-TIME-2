@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.screens.editCategoryContent
 import com.time2.superid.passwordHandler.screens.editPasswordContent
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
@@ -65,6 +66,12 @@ fun buildBottomModal(
             "category" -> registerCategoryContent(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss
+            )
+
+            "editCategory" -> editCategoryContent(
+                currentModalState = { currentModal = it },
+                onClose = onDismiss,
+                category = category!!
             )
 
             "success" -> successContent(

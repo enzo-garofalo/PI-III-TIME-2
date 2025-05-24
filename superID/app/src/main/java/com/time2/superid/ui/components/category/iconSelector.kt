@@ -40,7 +40,8 @@ fun IconSelectField(
     label: String,
     options: List<CategoryIcon>,
     selectedOption: CategoryIcon?,
-    onOptionSelected: (CategoryIcon) -> Unit
+    onOptionSelected: (CategoryIcon) -> Unit,
+    enabled : Boolean = true
 ) {
     val border = colorResource(id = R.color.border_color)
     val background = MaterialTheme.colorScheme.onTertiary
@@ -62,12 +63,13 @@ fun IconSelectField(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it }
+        onExpandedChange = { if (enabled) expanded = it }
     ) {
         OutlinedTextField(
             value = textFieldValue,
             readOnly = true,
             onValueChange = { },
+            enabled = enabled,
             label = {
                 Surface(color = background) {
                     Text(
@@ -89,7 +91,7 @@ fun IconSelectField(
                 }
             },
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                if(enabled) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
             modifier = Modifier
                 .menuAnchor()

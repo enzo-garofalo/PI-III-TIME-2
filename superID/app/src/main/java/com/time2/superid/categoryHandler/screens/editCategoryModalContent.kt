@@ -1,4 +1,4 @@
-package com.time2.superid.passwordHandler.screens
+package com.time2.superid.categoryHandler.screens
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,9 +36,8 @@ import androidx.compose.ui.unit.sp
 import com.time2.superid.R
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
-import com.time2.superid.passwordHandler.Password
-import com.time2.superid.passwordHandler.PasswordManager
-import com.time2.superid.ui.components.structure.CustomCategorySelectField
+import com.time2.superid.ui.components.category.CategoryIcon
+import com.time2.superid.ui.components.category.IconSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
@@ -46,42 +46,35 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Composable responsável pelo conteúdo do modal de registro de senhas.
- * O layout permanece fixo na parte inferior da tela, mesmo com o teclado aberto.
- *
- * @param currentModalState Função que define o próximo estado do modal
- * @param onClose Callback para fechar o modal
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun editPasswordContent(
+fun editCategoryContent(
     currentModalState: (String) -> Unit,
     onClose: () -> Unit,
-    password: Password
+    category: Category
 ) {
     val imeState = rememberImeState()
     val scrollState = rememberScrollState()
 
-    // Quando o teclado aparece, anima a rolagem para o final do conteúdo
     LaunchedEffect(key1 = imeState.value) {
         if (imeState.value) {
             scrollState.animateScrollTo(scrollState.maxValue, tween(300))
         }
     }
 
-    // Estado para exibir alerta de campos obrigatórios
     var showAlert by remember { mutableStateOf(false) }
     var missingFields by remember { mutableStateOf(listOf<String>()) }
 
-    // Diálogo de alerta para campos obrigatórios não preenchidos
     buildMissingFieldsDialog(
         show = showAlert,
         missingFields = missingFields,
         onDismiss = { showAlert = false }
     )
 
-    val repository = remember { PasswordManager() }
+    val catMan = remember { CategoryManager() }
+    var title by remember { mutableStateOf(category.title) }
+    var description by remember { mutableStateOf(category.description) }
+    var iconName by remember { mutableStateOf(category.iconName) }
 
     Column(
         modifier = Modifier
@@ -89,34 +82,19 @@ fun editPasswordContent(
             .fillMaxWidth()
             .fillMaxHeight(0.9f)
             .heightIn(min = 500.dp)
+            .padding(horizontal = 24.dp) // Padding nas laterais
     ) {
-
-
-        /**
-         * Garante que o conteúdo seja rolável e responsivo ao teclado virtual (IME).
-         */
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(scrollState)
                 .imeNestedScroll()
                 .imePadding()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(vertical = 16.dp) // Padding vertical
         ) {
-            // Estados dos campos de entrada
-            var username by remember { mutableStateOf(password.username) }
-            var passwodTitle by remember { mutableStateOf(password.passwordTitle) }
 
-            val pm = PasswordManager()
-            val decrypted = pm.decryptPassword(password.password)
-
-            var passwordToedit by remember { mutableStateOf(decrypted) }
-            var description by remember { mutableStateOf(password.description) }
-            var category : Category by remember { mutableStateOf(Category()) }
-
-            // Título principal
             Text(
-                text = "Altere sua senha",
+                text = "Altere sua Categoria",
                 style = TextStyle(
                     fontSize = 30.sp,
                     lineHeight = 36.sp,
@@ -124,68 +102,36 @@ fun editPasswordContent(
                 )
             )
 
-            // Aviso de campos obrigatórios
             Text(
-                text = "Mantenha suas informações seguras e sempre atualizadas.",
+                text = "Personalize suas categorias como quiser.",
                 color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
 
-            // Formulário de entrada com campos personalizados
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-//                CustomTextField(
-//                    label = "* Site/Serviço:",
-//                    isSingleLine = true,
-//                    value = partnerSite,
-//                    onValueChange = { partnerSite = it },
-//                    isPassword = false
-//                )
-                //
-
                 CustomTextField(
-                    label = "* Site/Serviço:",
+                    label = "* Nome da Categoria:",
                     isSingleLine = true,
-                    value = passwodTitle,
-                    onValueChange = { passwodTitle = it },
+                    value = title,
+                    onValueChange = { title = it },
                     isPassword = false
                 )
 
-                CustomTextField(
-                    label = "Nome de usuário:",
-                    isSingleLine = true,
-                    value = username,
-                    onValueChange = { username = it },
-                    isPassword = false
-                )
-
-                CustomTextField(
-                    label = "* Senha:",
-                    isSingleLine = true,
-                    value = passwordToedit,
-                    onValueChange = { passwordToedit = it },
-                    isPassword = true
-                )
-
-                // Opções de categoria
                 val categoriesState = remember { mutableStateOf<List<Category>>(emptyList()) }
-                val categoryManager = remember { CategoryManager() }
-
 
                 LaunchedEffect(Unit) {
-                    category = categoryManager.getCategoryById(password.categoryId)!!
-                    categoriesState.value = categoryManager.getCategories()
+                    categoriesState.value = catMan.getCategories()
                 }
 
-                CustomCategorySelectField(
-                    label         = "* Categoria:",
-                    options       = categoriesState.value,
-                    selectedOption= category,
+                IconSelectField(
+                    label = "Ícone da categoria:",
+                    options = CategoryIcon.entries,
+                    selectedOption = CategoryIcon.valueOf(category.iconName.uppercase()),
                     onOptionSelected = { selected ->
-                        category = selected
+                        iconName = selected.name
                     }
                 )
-
 
                 CustomTextField(
                     label = "Descrição:",
@@ -195,46 +141,37 @@ fun editPasswordContent(
                     isPassword = false
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // Botão de envio dos dados
+        Column(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .navigationBarsPadding() // Garante espaço para navegação inferior
+        ) {
             Button(
                 onClick = {
                     val missing = mutableListOf<String>()
-                    if (passwodTitle.isBlank()) missing.add("Site/Serviço")
-                    if (passwordToedit.isBlank()) missing.add("Senha")
+                    if (title.isBlank()) missing.add("Nome da Categoria")
 
                     if (missing.isNotEmpty()) {
                         showAlert = true
                         missingFields = missing
                     } else {
-                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                        if (user == null) {
-                            // Aqui você pode mostrar uma mensagem de erro
-                            println("Usuário não autenticado.")
-                            return@Button
-                        }
-
                         CoroutineScope(Dispatchers.IO).launch {
-
-                            val success = repository.updatePassword(
-                                password = password,
-                                newUsername = username,
-                                newPassword = passwordToedit,
+                            val success = catMan.updateCategory(
+                                category = category,
+                                newTitle = title,
                                 newDescription = description,
-                                newPasswordTitle = passwodTitle,
-                                newCategory = category.id,
-                                newPartnerSite = password.partnerSite // substitua por uma variável se quiser editar
+                                newIcon = iconName
                             )
 
                             withContext(Dispatchers.Main) {
                                 if (success) {
-                                    // Fecha modal ou mostra snackbar de sucesso
                                     currentModalState("success")
                                     onClose()
                                 } else {
-                                    // Exibe erro
                                     currentModalState("error")
                                 }
                             }
@@ -247,7 +184,7 @@ fun editPasswordContent(
                     .height(56.dp)
             ) {
                 Text(
-                    text = "Alterar senha",
+                    text = "Alterar categoria",
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                 )
@@ -256,9 +193,7 @@ fun editPasswordContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = {
-                    onClose()
-                },
+                onClick = { onClose() },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()
