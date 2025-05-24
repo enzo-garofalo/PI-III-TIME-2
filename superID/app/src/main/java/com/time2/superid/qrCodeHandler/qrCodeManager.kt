@@ -6,9 +6,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.util.Date
-import java.util.UUID
-import android.util.Base64
-import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.utils.TokenUtils
 
 class qrCodeManager {
@@ -18,7 +15,7 @@ class qrCodeManager {
     // Processa o loginToken
     suspend fun processLoginToken(loginToken: String): String {
         // Verifica se o usuário está logado
-        val userId = auth.currentUser?.uid ?: throw Exception("Usuário não está logado")
+        val userUID = auth.currentUser?.uid ?: throw Exception("Usuário não está logado")
 
         // Obtém a referência do documento na coleção login
         val loginDocRef = firestore.collection("login").document(loginToken)
@@ -33,7 +30,7 @@ class qrCodeManager {
 
         // Busca o documento correspondente na coleção userPasswords
         val passwordQuery = firestore.collection("userPasswords")
-            .document(userId)
+            .document(userUID)
             .collection("passwords")
             .whereEqualTo("partnerSite", partnerSite)
             .get()
@@ -43,7 +40,7 @@ class qrCodeManager {
             throw Exception("Nenhuma senha encontrada para o site parceiro")
         }
 
-        // Assume que há apenas um documento correspondente (ajuste conforme necessário)
+        // Assume que há apenas um documento correspondente
         val passwordDoc = passwordQuery.documents.first()
         val username = passwordDoc.getString("username") ?: ""
         val encryptedPassword = passwordDoc.getString("password") ?: throw Exception("Senha não encontrada")
@@ -51,33 +48,27 @@ class qrCodeManager {
 
         // Atualiza o documento na coleção login com tipo explícito
         val loginUpdates: HashMap<String, Any> = hashMapOf(
-            "UserUID" to userId,
+            "UserUID" to userUID,
             "username" to username,
-            "password" to encryptedPassword, // Armazena a senha criptografada
-            "loginTime" to Date() // Usa loginTimestamp conforme especificado
+            "password" to encryptedPassword,
+            "loginTime" to Date()
         )
         loginDocRef.update(loginUpdates).await()
 
-        // Gera um novo accessToken (Base64 de 256 caracteres)
+        // Gera um novo accessToken
         val newAccessToken = TokenUtils.generateAccessToken()
 
-        // Atualiza o accessToken e lastUpdated na coleção userPasswords com tipo explícito
+        // Atualiza o accessToken e lastUpdated na coleção userPasswords
         val passwordUpdates: HashMap<String, Any> = hashMapOf(
             "accessToken" to newAccessToken,
             "lastUpdated" to Date()
         )
         val passwordDocRef = firestore.collection("userPasswords")
-            .document(userId)
+            .document(userUID)
             .collection("passwords")
             .document(passwordId)
         passwordDocRef.update(passwordUpdates).await()
 
         return partnerSite
-    }
-
-    // Geração do accesToken
-    private fun generateAccessTokens(): String {
-        val randomBytes = UUID.randomUUID().toString() + UUID.randomUUID().toString()
-        return Base64.encodeToString(randomBytes.toByteArray(), Base64.NO_WRAP)
     }
 }
