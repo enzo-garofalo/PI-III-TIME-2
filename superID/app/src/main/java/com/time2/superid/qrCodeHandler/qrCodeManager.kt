@@ -48,7 +48,7 @@ class qrCodeManager {
 
         // Atualiza o documento na coleção login com tipo explícito
         val loginUpdates: HashMap<String, Any> = hashMapOf(
-            "UserUID" to userUID,
+            "userUID" to userUID,
             "username" to username,
             "password" to encryptedPassword,
             "loginTime" to Date()
