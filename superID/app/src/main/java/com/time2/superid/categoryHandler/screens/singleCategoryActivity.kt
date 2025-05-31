@@ -125,14 +125,14 @@ class SingleCategoryActivity : ComponentActivity()
                                 category = category!!,
                                 onDeleteClick = {
                                     coroutineScope.launch {
-                                        if (category!!.numOfPasswords > 0) {
-
+                                        //Checando se é possível deletar categoria
+                                        if (category!!.numOfPasswords > 0 || !category!!.isDeletable) {
                                             val passMan = PasswordManager()
                                             categoryPasswordList =
                                                 passMan.getPasswordsByCategoryID(categoryId)
                                             showAlert = true
                                         }else{
-                                            // TODO: modal bonito antes de deletar categoria
+
                                             val deleted = catMan.deleteCategory(categoryId)
                                             if (deleted) {
                                                 startActivity(Intent(
@@ -142,6 +142,7 @@ class SingleCategoryActivity : ComponentActivity()
                                             } else {
                                                 Log.e("Delete", "Erro ao deletar categoria")
                                             }
+
                                         }
                                     }
                                 },

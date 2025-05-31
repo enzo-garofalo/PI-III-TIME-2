@@ -62,20 +62,31 @@ fun failToDeleteCategoryContent(
             fontSize = 20.sp
         )
 
+
         val count = category.numOfPasswords
-        val senhaText = when (count) {
-            0 -> "Nenhuma senha"
-            1 -> "1 senha"
-            else -> "$count senhas"
+        if(count > 0){
+            val senhaText = when (count) {
+                1 -> "1 senha"
+                else -> "$count senhas"
+            }
+
+            Text(
+                text = "Você tem $senhaText em ${category.title}",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+            )
+        }else if(!category.isDeletable){
+            Text(
+                text = "Essa senha é padrão do SuperID",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+            )
         }
 
-        Text(
-            text = "Você tem $senhaText em ${category.title}",
-            color = Color.Gray,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
-        )
 
         Button(
             onClick = { onClose() },
