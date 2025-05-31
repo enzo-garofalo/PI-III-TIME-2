@@ -105,10 +105,10 @@ fun buildBottomBar(
                     val intent = Intent(context, HomeActivity::class.java)
                     intent.putExtra("selectedIndex", 0)
                     context.startActivity(intent)
-                   if(context is Activity)
-                   {
-                       context.finish()
-                   }
+                    if(context is Activity)
+                    {
+                        context.finish()
+                    }
                 }
                 1 -> {
                     val intent = Intent(context, AllPasswordsActivity::class.java)

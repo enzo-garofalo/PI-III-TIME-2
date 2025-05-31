@@ -361,4 +361,3 @@ fun CustomCategorySelectField(
         }
     }
 }
-

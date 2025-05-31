@@ -91,9 +91,6 @@ class SinglePasswordActivity : ComponentActivity()
                             userName = userName,
                             showBackClick = true,
                             onBackClick = {
-                                startActivity(
-                                    Intent(this@SinglePasswordActivity, HomeActivity::class.java)
-                                )
                                 finish()
                             },
                             onLogoutClick = {
