@@ -189,23 +189,30 @@ fun SinglePasswordCompose(
                 enabled = false
             )
 
-            // TODO: melhorar ao criar categoia
-            val catMan = CategoryManager()
-            var category by remember { mutableStateOf(Category()) }
+            // A instândia com remember impede que ele seja recriado a cada recomposição
+            val catMan = remember { CategoryManager() }
+            var category by remember { mutableStateOf<Category?>(null) }
 
-            LaunchedEffect(Unit) {
-                category = catMan.getCategoryById(password.categoryId)!!
+
+            // Executa o código dentro dele quando o valor password.categoryId muda
+            LaunchedEffect(key1 = password.categoryId) {
+                category = catMan.getCategoryById(password.categoryId)
             }
 
-            val categ = Element(
-                isPassword = false,
-                id = "",
-                title = category.title,
-                description = category.description,
-                category = category,
-            )
+            //  Verifica se category é diferente de null
+            category?.let { currentCategory ->
+                val categElement = Element(
+                    isPassword = false,
+                    id = "",
+                    title = currentCategory.title,
+                    description = currentCategory.description,
+                    category = currentCategory
+                )
+                elementButton(categElement)
+            } ?: run {
 
-            elementButton(categ)
+                Text("Loading category…")
+            }
 
             Button(
                 onClick = { context.startActivity(Intent(context, qrCodeScanActivity::class.java)) },
