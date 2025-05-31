@@ -36,6 +36,7 @@ import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.screens.SinglePasswordActivity
+import com.time2.superid.ui.components.utils.showEmptyPasswordList
 
 data class Element(
     val isPassword : Boolean = false,
@@ -124,25 +125,30 @@ fun elementButton(
 fun showPasswordList(
     passwordList: MutableState<List<Password>>
 ) {
-    val categoryManager = CategoryManager()
+
+    val categoryManager = remember { CategoryManager() }
     val categories = remember { mutableStateOf<List<Category>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         categories.value = categoryManager.getCategories()
     }
 
-    val categoriesMap = categories.value.associateBy { it.id }
+    if(passwordList.value.isNotEmpty()){
+        val categoriesMap = categories.value.associateBy { it.id }
 
-    val elementList = passwordList.value.map { password ->
-        val category = categoriesMap[password.categoryId] ?: Category()
-        Element(
-            isPassword = true,
-            id = password.id,
-            title = password.passwordTitle,
-            description = password.description,
-            category = category
-        )
+        val elementList = passwordList.value.map { password ->
+            val category = categoriesMap[password.categoryId] ?: Category()
+            Element(
+                isPassword = true,
+                id = password.id,
+                title = password.passwordTitle,
+                description = password.description,
+                category = category
+            )
+        }
+
+        buildElementsShowCase(elementList)
+    }else{
+        showEmptyPasswordList()
     }
-
-    buildElementsShowCase(elementList)
 }
