@@ -93,6 +93,15 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.SuperID"/>
 
+
+        <!-- Activity de all passwords list-->
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".passwordHandler.screens.AllPasswordsActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SuperID"/>
+
         <!-- Activity de List password bby category-->
         <activity
             android:windowSoftInputMode="adjustResize"
