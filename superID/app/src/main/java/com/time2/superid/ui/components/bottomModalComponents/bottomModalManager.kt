@@ -18,6 +18,7 @@ import com.time2.superid.passwordHandler.screens.editPasswordContent
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
 import com.time2.superid.categoryHandler.screens.registerCategoryContent
+import com.time2.superid.passwordHandler.screens.deletePasswordContent
 import com.time2.superid.passwordHandler.screens.registerPasswordContent
 import com.time2.superid.ui.components.bottomModalComponents.successContent
 
@@ -60,6 +61,12 @@ fun buildBottomModal(
             )
 
             "editPassword" -> editPasswordContent(
+                currentModalState = { currentModal = it },
+                onClose = onDismiss,
+                password = password!!
+            )
+
+            "deletePassword" -> deletePasswordContent(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss,
                 password = password!!

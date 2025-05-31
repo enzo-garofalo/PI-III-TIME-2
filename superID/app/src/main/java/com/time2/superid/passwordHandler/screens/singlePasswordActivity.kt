@@ -68,6 +68,7 @@ class SinglePasswordActivity : ComponentActivity()
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
                 var reloadTrigger by remember { mutableStateOf(false) }
+                var showDeletePasswordModal by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
@@ -111,16 +112,7 @@ class SinglePasswordActivity : ComponentActivity()
                             SinglePasswordCompose(
                                 password = password!!,
                                 onDeleteClick = {
-                                    coroutineScope.launch {
-                                        // TODO: modal bonito antes de deletar categoria
-                                        val deleted = passwordManager.deletePassword(docId.toString())
-                                        if (deleted) {
-                                            startActivity(Intent(this@SinglePasswordActivity, HomeActivity::class.java))
-                                            finish()
-                                        } else {
-                                            Log.e("Delete", "Erro ao deletar senha")
-                                        }
-                                    }
+                                    showDeletePasswordModal = true
                                 },
                                 onReloadTrigger = {
                                     reloadTrigger = !reloadTrigger
@@ -130,6 +122,14 @@ class SinglePasswordActivity : ComponentActivity()
                             Text("Carregando senha...")
                         }
                     }
+                }
+
+                if(showDeletePasswordModal){
+                 buildBottomModal(
+                     onDismiss = { showDeletePasswordModal = false },
+                     currentModal = "deletePassword",
+                     password = password
+                 )
                 }
             }
         }
