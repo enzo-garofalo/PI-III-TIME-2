@@ -137,7 +137,7 @@ fun registerPasswordContent(
             var username by remember { mutableStateOf("") }
             var passwodTitle by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
-            var category by remember { mutableStateOf(Category()) }
+            var category by remember { mutableStateOf<Category?>(null) }
             var description by remember { mutableStateOf("") }
 
             // Título principal
@@ -230,6 +230,7 @@ fun registerPasswordContent(
                     val missing = mutableListOf<String>()
                     if (passwodTitle.isBlank()) missing.add("Site/Serviço")
                     if (password.isBlank()) missing.add("Senha")
+                    if (category == null) missing.add("Categoria")
 
                     if (missing.isNotEmpty()) {
                         showAlert = true
@@ -247,14 +248,14 @@ fun registerPasswordContent(
                                 partnerSite = "www.superidweb.com.br",
                                 username = username,
                                 password = password,
-                                categoryId = category.id,
+                                categoryId = category!!.id,
                                 description = description,
                             )
 
                             withContext(Dispatchers.Main) {
                                 if (success) {
                                     val categoryManager = CategoryManager()
-                                    categoryManager.incrementNumOfPasswords(category.id)
+                                    categoryManager.incrementNumOfPasswords(category!!.id)
                                     currentModalState("success")
                                 } else {
                                     println("Erro ao registrar a senha.")

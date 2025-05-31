@@ -293,7 +293,14 @@ fun CustomCategorySelectField(
             leadingIcon = {
                 selectedOption?.let {
                     Icon(
-                        painter = getCategoryIcon(it.iconName),
+                        painter =  getCategoryIcon(it.iconName),
+                        contentDescription = "Ícone da categoria",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } ?: run {
+                    Icon(
+                        painter =  getCategoryIcon("generic"),
                         contentDescription = "Ícone da categoria",
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.primary
