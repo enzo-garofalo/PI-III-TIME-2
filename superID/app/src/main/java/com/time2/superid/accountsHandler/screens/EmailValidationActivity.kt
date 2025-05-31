@@ -57,16 +57,17 @@ class EmailValidationActivity : ComponentActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Control a visibilidade das barras do sistema
+        // Controla visibilidade das barras do sistema
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            // Oculta a navigation bar (barra de menu)
+            // Oculta a barra de menu
             hide(WindowInsetsCompat.Type.navigationBars())
-            // Garante que a status bar (barra de notificação) permaneça visível
+            // Garante que a barra de notificacao permaneca visível
             show(WindowInsetsCompat.Type.statusBars())
-            // Define o comportamento para que a navigation bar não reapareça com gestos
+            // Define o comportamento para que a navigation bar nao reapareca com gestos
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
+        // Cor de fundo da barra de notificacao
         window.statusBarColor = android.graphics.Color.BLACK
 
         setContent{
@@ -75,6 +76,7 @@ class EmailValidationActivity : ComponentActivity()
             }
         }
     }
+
 }
 
 
@@ -98,7 +100,7 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Ícone de Sucesso
+        // Icone de Sucesso
         Image(
             painter = painterResource(id = R.drawable.successmark),
             contentDescription = "image description",
@@ -138,7 +140,7 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // Botão de verificacao
+        // Botao de verificacao
         Button(
             onClick = {
                 userAccountsManager.checkEmailVerification { isVerified ->
@@ -184,13 +186,13 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
             }
         }
 
-        // Espaçamento entre os botões
+        // Espacamento entre os botoes
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Novo botão "Voltar"
+        // Novo botao "Voltar"
         Button(
             onClick = {
-                // Fecha a activity atual e retorna à anterior
+                // Fecha a activity atual e retorna a anterior
                 context.startActivity(Intent(context, LoginActivity::class.java))
                 (context as? EmailValidationActivity)?.finish()
             },
