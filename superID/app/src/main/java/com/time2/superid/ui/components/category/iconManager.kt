@@ -8,6 +8,7 @@ import com.time2.superid.R
 import java.lang.IllegalArgumentException
 
 enum class CategoryIcon(val label: String, @DrawableRes val resId : Int){
+    APPS("Apps",  R.drawable.ic_apps),
     CART("Compras", R.drawable.ic_cart),
     CARD("Cartões", R.drawable.ic_creditcard),
     CRYPTO("Criptomoedas", R.drawable.ic_cripto),

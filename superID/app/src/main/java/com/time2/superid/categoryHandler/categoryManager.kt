@@ -14,7 +14,7 @@ data class Category(
     val description : String = "",
     val iconName    : String = CategoryIcon.GENERIC.name,
     val isDefault   : Boolean = false,
-    val isDeletable : Boolean = false,
+    val isDeletable : Boolean = true,
     val createdAt   : Timestamp = Timestamp.now(),
     val numOfPasswords: Int = 0
 )
@@ -37,7 +37,7 @@ class CategoryManager {
         description : String = "",
         iconName : String = CategoryIcon.GENERIC.label,
         isDefault : Boolean = false,
-        isDeletable : Boolean = false
+        isDeletable : Boolean = true
     ): Boolean {
         val collection = getCategoryCollection() ?: return false.also {
             Log.e("CategoryManager", "Usuário não autenticado ao criar senha")
@@ -202,5 +202,49 @@ class CategoryManager {
             .addOnFailureListener { e ->
                 Log.w("CategoryManager", "Erro ao obter contador atual", e)
             }
+    }
+
+    fun createBasicCategories(userId: String){
+        val categories = listOf(
+            Category(
+                title = "Apps",
+                description = "Meus aplicativos",
+                iconName = CategoryIcon.APPS.name,
+                isDefault = true,
+                isDeletable = false
+            ),
+            Category(
+                title = "Web",
+                description = "Meus sites web",
+                iconName = CategoryIcon.WEB.name,
+                isDefault = true,
+                isDeletable = true
+            ),
+            Category(
+                title = "NumPad",
+                description = "Meus Teclados numéricos",
+                iconName = CategoryIcon.PINPAD.name,
+                isDefault = true,
+                isDeletable = true
+            )
+        )
+
+        val catCollection = db.collection("userCategory")
+            .document(userId)
+            .collection("categories")
+
+        for (category in categories) {
+            val newCategoryRef = catCollection.document()
+            // Criando campo ID
+            val categoryWithId = category.copy(id = newCategoryRef.id)
+
+            newCategoryRef.set(categoryWithId)
+                .addOnSuccessListener {
+                    Log.d("CategoryManager", "Categoria '${category.title}' salva com sucesso.")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("CategoryManager", "Erro ao salvar categoria '${category.title}'", e)
+                }
+        }
     }
 }

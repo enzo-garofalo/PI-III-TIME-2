@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.time2.superid.accountsHandler.screens.EmailValidationActivity
+import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.utils.getDeviceID
 import com.time2.superid.utils.showShortToast
 
@@ -23,6 +24,7 @@ data class UserAccount(
 class UserAccountsManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val catMan : CategoryManager = CategoryManager()
     private val TAG = "UserAccountsManager"
 
     fun createUserAccount(email: String, password: String, name: String, context: Context) {
@@ -150,6 +152,7 @@ class UserAccountsManager {
             .document()
             .set(userAccount)
             .addOnSuccessListener {
+                catMan.createBasicCategories(userAccount.uid)
                 Log.d("Firestore", "Dados salvos com sucesso")
             }
             .addOnFailureListener { e ->
