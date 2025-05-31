@@ -89,9 +89,7 @@ class HomeActivity : ComponentActivity() {
                         )
                     },
                     bottomBar = {
-                        buildBottomBar(
-                            this@HomeActivity
-                        )
+                        buildBottomBar(this@HomeActivity, selectedIndex = 0)
                     },
                     floatingActionButton = {
                         buildFloatingActionButton(

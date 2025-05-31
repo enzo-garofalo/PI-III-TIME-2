@@ -1,5 +1,6 @@
 package com.time2.learningui_ux.components
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -28,66 +29,52 @@ import androidx.compose.ui.unit.dp
 import com.time2.superid.HomeActivity
 import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.R
+import com.time2.superid.passwordHandler.screens.AllPasswordsActivity
 
 
 data class BottonNavigationItem(
     var title: String,
     var icon: Painter,
-    val hasNews: Boolean,
-    val badgeCount: Int? = null
 )
 
 @Composable
 fun bottomNavBar(
     items: List<BottonNavigationItem>,
     selectedIndex: Int,
-    onItemSelected: (Int) -> Unit,
-    content: @Composable (Modifier) -> Unit)
-{
+    onItemSelected: (Int) -> Unit
+) {
     Surface(
-        tonalElevation = 4.dp, // Sombra sutil acima
-        color = Color.White, // Fundo branco
-        shadowElevation = 4.dp // Sombra visível mesmo em temas claros
-    ){
+        tonalElevation = 4.dp,
+        color = Color.White,
+        shadowElevation = 4.dp
+    ) {
         NavigationBar(
             modifier = Modifier
                 .padding(WindowInsets.navigationBars.asPaddingValues()),
             containerColor = MaterialTheme.colorScheme.background
-        ){
-            items.forEachIndexed {index, item ->
+        ) {
+            items.forEachIndexed { index, item ->
                 NavigationBarItem(
-                    modifier = Modifier
-                        .background(color = Color.White), // Fundo branco
+                    modifier = Modifier.background(color = Color.White),
                     selected = selectedIndex == index,
-                    onClick = {
-                        onItemSelected(index)
-                    },
+                    onClick = { onItemSelected(index) },
                     label = {
                         Text(
                             text = item.title,
                             style = MaterialTheme.typography.labelSmall
-                        )},
+                        )
+                    },
                     icon = {
-                        BadgedBox(
-                            badge = {
-                                if (item.badgeCount != null) {
-                                    Badge {
-                                        Text(text = item.badgeCount.toString())
-                                    }
-                                }else if(item.hasNews){
-                                    Badge()
-                                }
-                            }
-                        ) {
-                            val icon = item.icon
-                            val iconTint = if (index == selectedIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                        val iconTint = if (index == selectedIndex)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.secondary
 
-                            Icon(
-                                painter = icon,
-                                contentDescription = item.title,
-                                tint = iconTint
-                            )
-                        }
+                        Icon(
+                            painter = item.icon,
+                            contentDescription = item.title,
+                            tint = iconTint
+                        )
                     }
                 )
             }
@@ -97,45 +84,49 @@ fun bottomNavBar(
 
 @Composable
 fun buildBottomBar(
-    context: Context
-)
-{
+    context: Context,
+    selectedIndex: Int
+) {
     val items = listOf(
-        BottonNavigationItem(
-            "Home",
-            painterResource(id = R.drawable.ic_home),
-            false,
-            null
-        ),
-        BottonNavigationItem(
-            "Senhas",
-            painterResource(id = R.drawable.ic_shield),
-            false,
-            25
-        ),
-        BottonNavigationItem(
-            "Configurações",
-            painterResource(id = R.drawable.ic_settings),
-            true,
-            null
-        )
+        BottonNavigationItem("Home", painterResource(id = R.drawable.ic_home)),
+        BottonNavigationItem("Senhas", painterResource(id = R.drawable.ic_shield)),
+        BottonNavigationItem("Configurações", painterResource(id = R.drawable.ic_settings))
     )
-    var selectedItemIndex by rememberSaveable { mutableStateOf( 0 ) }
+
+    var selectedItemIndex by rememberSaveable { mutableStateOf(selectedIndex) }
 
     bottomNavBar(
         items = items,
         selectedIndex = selectedItemIndex,
-        onItemSelected = { index -> selectedItemIndex = index }
-    ) { modifier ->
-        when (selectedItemIndex) {
-            // Redirect to HomeActivity
-            0 -> context.startActivity(Intent(context, HomeActivity::class.java))
-
-            // TODO: redefine it to redirect to password dedicated activity
-            1 -> context.startActivity(Intent(context, LoginActivity::class.java))
-
-            // TODO: redefine it to redirect to config dedicated activity
-            2 -> context.startActivity(Intent(context, LoginActivity::class.java))
+        onItemSelected = { index ->
+            selectedItemIndex = index
+            when (index) {
+                0 -> {
+                    val intent = Intent(context, HomeActivity::class.java)
+                    intent.putExtra("selectedIndex", 0)
+                    context.startActivity(intent)
+                   if(context is Activity)
+                   {
+                       context.finish()
+                   }
+                }
+                1 -> {
+                    val intent = Intent(context, AllPasswordsActivity::class.java)
+                    intent.putExtra("selectedIndex", 1)
+                    context.startActivity(intent)
+                    if(context is Activity)
+                    {
+                        context.finish()
+                    }
+                }
+                2 -> {
+                    context.startActivity(Intent(context, LoginActivity::class.java))
+                    if(context is Activity)
+                    {
+                        context.finish()
+                    }
+                }
+            }
         }
-    }
+    )
 }
