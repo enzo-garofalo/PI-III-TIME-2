@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.time2.superid.categoryHandler.Category
+import com.time2.superid.categoryHandler.screens.deleteCategoryContent
 import com.time2.superid.categoryHandler.screens.editCategoryContent
 import com.time2.superid.categoryHandler.screens.failToDeleteCategoryContent
 import com.time2.superid.passwordHandler.screens.editPasswordContent
@@ -75,7 +76,13 @@ fun buildBottomModal(
                 category = category!!
             )
 
-            "failureToDelete" -> failToDeleteCategoryContent(
+            "failureToDeleteCategory" -> failToDeleteCategoryContent(
+                currentModalState = { currentModal = it },
+                onClose = onDismiss,
+                category = category!!
+            )
+
+            "deleteCategory" -> deleteCategoryContent(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss,
                 category = category!!

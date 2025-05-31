@@ -80,7 +80,8 @@ class SingleCategoryActivity : ComponentActivity()
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
 
-                var showAlert by remember { mutableStateOf(false) }
+                var showFailToDeleteCategory by remember { mutableStateOf(false) }
+                var showDeleteCategory by remember { mutableStateOf(false) }
                 var categoryPasswordList by remember { mutableStateOf<List<Password>>(emptyList()) }
 
 
@@ -124,26 +125,11 @@ class SingleCategoryActivity : ComponentActivity()
                             SingleCategoryCompose(
                                 category = category!!,
                                 onDeleteClick = {
-                                    coroutineScope.launch {
-                                        //Checando se é possível deletar categoria
-                                        if (category!!.numOfPasswords > 0 || !category!!.isDeletable) {
-                                            val passMan = PasswordManager()
-                                            categoryPasswordList =
-                                                passMan.getPasswordsByCategoryID(categoryId)
-                                            showAlert = true
-                                        }else{
-
-                                            val deleted = catMan.deleteCategory(categoryId)
-                                            if (deleted) {
-                                                startActivity(Intent(
-                                                    this@SingleCategoryActivity,
-                                                    HomeActivity::class.java))
-                                                finish()
-                                            } else {
-                                                Log.e("Delete", "Erro ao deletar categoria")
-                                            }
-
-                                        }
+                                    //Checando se é possível deletar categoria
+                                    if (category!!.numOfPasswords > 0 || !category!!.isDeletable) {
+                                        showFailToDeleteCategory = true
+                                    }else{
+                                        showDeleteCategory = true
                                     }
                                 },
                                 onReloadTrigger = {
@@ -156,14 +142,22 @@ class SingleCategoryActivity : ComponentActivity()
                         }
                     }
 
-                    if(showAlert)
+                    if(showFailToDeleteCategory)
                     {
                         buildBottomModal(
-                            onDismiss = { showAlert = false },
-                            currentModal = "failureToDelete",
+                            onDismiss = { showFailToDeleteCategory = false },
+                            currentModal = "failureToDeleteCategory",
+                            category = category
+                        )
+                    }else if(showDeleteCategory){
+                        buildBottomModal(
+                            onDismiss = { showDeleteCategory = false },
+                            currentModal = "deleteCategory",
                             category = category
                         )
                     }
+
+
                 }
             }
         }
