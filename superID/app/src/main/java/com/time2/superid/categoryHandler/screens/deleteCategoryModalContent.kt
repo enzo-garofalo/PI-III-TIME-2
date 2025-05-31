@@ -55,12 +55,6 @@ fun failToDeleteCategoryContent(
 
         Spacer(modifier = Modifier.height(9.dp))
 
-        Text(
-            text = "Oops, não é possível deletar categoria com senhas!",
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp
-        )
 
 
         val count = category.numOfPasswords
@@ -71,6 +65,13 @@ fun failToDeleteCategoryContent(
             }
 
             Text(
+                text = "Oops, não é possível deletar categoria com senhas!",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+
+            Text(
                 text = "Você tem $senhaText em ${category.title}",
                 color = Color.Gray,
                 fontSize = 14.sp,
@@ -79,7 +80,14 @@ fun failToDeleteCategoryContent(
             )
         }else if(!category.isDeletable){
             Text(
-                text = "Essa senha é padrão do SuperID",
+                text = "Oops, não é possível deletar essa categoria!",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = "Essa categoria é padrão do SuperID",
                 color = Color.Gray,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,

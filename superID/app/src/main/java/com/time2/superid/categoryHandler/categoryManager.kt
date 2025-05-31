@@ -90,8 +90,8 @@ class CategoryManager {
                     title = data["title"] as? String ?: "",
                     description = data["description"] as? String ?: "",
                     iconName = data["iconName"] as? String ?: CategoryIcon.GENERIC.name,
-                    isDefault = data["isDefault"] as? Boolean ?: false,
-                    isDeletable = data["isDeletable"] as? Boolean ?: false,
+                    isDefault = data["default"] as? Boolean ?: false,
+                    isDeletable = data["deletable"] as? Boolean ?: false,
                     createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now(),
                     numOfPasswords = (data["numOfPasswords"] as? Long)?.toInt() ?: 0 // Firestore stores integers as Long
                 )
