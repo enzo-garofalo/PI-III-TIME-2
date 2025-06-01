@@ -21,6 +21,7 @@ import com.time2.superid.ui.components.bottomModalComponents.menuContent
 import com.time2.superid.categoryHandler.screens.registerCategoryContent
 import com.time2.superid.passwordHandler.screens.deletePasswordContent
 import com.time2.superid.passwordHandler.screens.registerPasswordContent
+import com.time2.superid.ui.components.bottomModalComponents.logoutModalContent
 import com.time2.superid.ui.components.bottomModalComponents.successContent
 import com.time2.superid.ui.components.bottomModalComponents.successScanContent
 
@@ -29,6 +30,7 @@ import com.time2.superid.ui.components.bottomModalComponents.successScanContent
 fun buildBottomModal(
     onDismiss : () -> Unit,
     currentModal : String,
+    onLogout : () -> Unit = { },
     password : Password? = null,
     category : Category? = null,
     partnerSite: String? = null
@@ -112,6 +114,11 @@ fun buildBottomModal(
 
             "successScan" -> successScanContent(
                 onClose = onDismiss
+            )
+
+            "logOutModal" -> logoutModalContent(
+                onClose = onDismiss,
+                onLogout = onLogout
             )
         }
     }

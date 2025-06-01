@@ -30,6 +30,7 @@ import com.time2.superid.HomeActivity
 import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.R
 import com.time2.superid.passwordHandler.screens.AllPasswordsActivity
+import com.time2.superid.settingsHandler.SettingsActivity
 
 
 data class BottonNavigationItem(
@@ -120,7 +121,9 @@ fun buildBottomBar(
                     }
                 }
                 2 -> {
-                    context.startActivity(Intent(context, LoginActivity::class.java))
+                    val intent = Intent(context, SettingsActivity::class.java)
+                    intent.putExtra("selectedIndex", 2)
+                    context.startActivity(intent)
                     if(context is Activity)
                     {
                         context.finish()

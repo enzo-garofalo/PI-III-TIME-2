@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import com.time2.superid.R
 @Composable
 fun logoutModalContent(
     onClose: () -> Unit,
+    onLogout: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -49,7 +51,7 @@ fun logoutModalContent(
         Spacer(modifier = Modifier.height(9.dp))
 
         Text(
-            text = "Ooops, já vai?",
+            text = "Oops, já vai??",
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
@@ -62,26 +64,31 @@ fun logoutModalContent(
         )
 
         Button(
-            onClick = { onClose() },
+            onClick = { onLogout() },
             shape = RoundedCornerShape(50),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(46.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFF64650),
+                contentColor = Color.White
+            )
         ) {
             Text(
-                text = "Sair do SuperID",
+                text = "Sair",
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(R.font.urbanist_medium))
             )
         }
 
+        Spacer(modifier = Modifier.height(9.dp))
 
         Button(
             onClick = { onClose() },
             shape = RoundedCornerShape(50),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(46.dp)
         ) {
             Text(
                 text = "Voltar",
