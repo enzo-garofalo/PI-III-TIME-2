@@ -171,6 +171,7 @@ fun SingleCategoryCompose(
     onReloadTrigger: () -> Unit
 ) {
     var showEditModal by remember { mutableStateOf(false) }
+    var showFailEditModal by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Conteúdo rolável
@@ -242,7 +243,13 @@ fun SingleCategoryCompose(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Button(
-                onClick = { showEditModal = true },
+                onClick = {
+                    if(category.isDefault){
+                        showFailEditModal = true
+                    }else{
+                        showEditModal = true
+                    }
+                },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -263,6 +270,15 @@ fun SingleCategoryCompose(
                 onReloadTrigger()
             },
             currentModal = "editCategory",
+            category = category
+        )
+    }else if(showFailEditModal){
+        buildBottomModal(
+            onDismiss = {
+                showFailEditModal = false
+                onReloadTrigger()
+            },
+            currentModal = "failEditCategory",
             category = category
         )
     }

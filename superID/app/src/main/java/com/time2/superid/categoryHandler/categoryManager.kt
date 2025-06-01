@@ -211,7 +211,7 @@ class CategoryManager {
                 description = "Meus aplicativos",
                 iconName = CategoryIcon.APPS.name,
                 isDefault = true,
-                isDeletable = false
+                isDeletable = true
             ),
             Category(
                 title = "Web",

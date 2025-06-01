@@ -14,6 +14,7 @@ import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.screens.deleteCategoryContent
 import com.time2.superid.categoryHandler.screens.editCategoryContent
 import com.time2.superid.categoryHandler.screens.failToDeleteCategoryContent
+import com.time2.superid.categoryHandler.screens.failToEditCategoryContent
 import com.time2.superid.passwordHandler.screens.editPasswordContent
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.ui.components.bottomModalComponents.menuContent
@@ -86,6 +87,11 @@ fun buildBottomModal(
                 currentModalState = { currentModal = it },
                 onClose = onDismiss,
                 category = category!!
+            )
+
+            "failEditCategory" -> failToEditCategoryContent(
+                currentModalState = { currentModal = it },
+                onClose = onDismiss
             )
 
             "failureToDeleteCategory" -> failToDeleteCategoryContent(

@@ -6,18 +6,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,11 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.time2.superid.R
@@ -205,6 +213,58 @@ fun editCategoryContent(
                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                 )
             }
+        }
+    }
+}
+@Composable
+fun failToEditCategoryContent(
+    currentModalState: (String) -> Unit,
+    onClose: () -> Unit,
+){
+    Column(
+        modifier = Modifier
+            .padding(WindowInsets.navigationBars.asPaddingValues())
+            .background(color = Color.White)
+            .fillMaxWidth()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ){
+        Icon(
+            painter = painterResource(id = R.drawable.ic_failed),
+            contentDescription = "ícone de falha de processo",
+            tint = Color.Unspecified
+        )
+
+        Spacer(modifier = Modifier.height(9.dp))
+
+        Text(
+            text = "Oops, não é possível editar essa categoria!",
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
+
+        Text(
+            text = "Essa categoria é padrão do SuperID",
+            color = Color.Gray,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+        )
+
+        Button(
+            onClick = { onClose() },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
+            Text(
+                text = "Voltar",
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist_medium))
+            )
         }
     }
 }
