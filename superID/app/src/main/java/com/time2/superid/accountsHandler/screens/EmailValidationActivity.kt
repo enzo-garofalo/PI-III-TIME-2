@@ -67,7 +67,6 @@ class EmailValidationActivity : ComponentActivity()
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-
         setContent{
             SuperIDTheme {
                 EmailValidationCompose(userAccountsManager)
@@ -125,7 +124,7 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Por favor, verifique seu e-mail\npara confirmar sua conta.",
+            text = "Por favor, verifique seu e-mail para\n confirmar sua conta e usar\n o login sem senha.",
             style = TextStyle(
                 fontSize = 15.sp,
                 lineHeight = 22.5.sp,
@@ -141,16 +140,9 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
         // Botao de verificacao
         Button(
             onClick = {
-                userAccountsManager.checkEmailVerification { isVerified ->
-
-                    if (isVerified) {
-                        showShortToast(context, "Bem vindo ao SuperID")
-                        context.startActivity(Intent(context, HomeActivity::class.java))
-                        (context as? EmailValidationActivity)?.finish()
-                    } else {
-                        showShortToast(context, "Email não foi verificado!")
-                    }
-                }
+                showShortToast(context, "Bem vindo ao SuperID")
+                context.startActivity(Intent(context, HomeActivity::class.java))
+                (context as? EmailValidationActivity)?.finish()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,7 +164,7 @@ fun EmailValidationView(userAccountsManager: UserAccountsManager, modifier: Modi
                 )
             } else {
                 Text(
-                    text = "Já verifiquei meu email",
+                    text = "Ir para a home",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontFamily = FontFamily(Font(R.font.urbanist)),

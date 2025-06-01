@@ -115,52 +115,6 @@ fun ForgetPassEmailSendScreen(userAccountsManager: UserAccountsManager) {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // Botão de verificação
-        Button(
-            onClick = {
-                userAccountsManager.checkEmailVerification { isVerified ->
-                    if (isVerified) {
-                        showShortToast(context, "Email verificado com sucesso!")
-                        context.startActivity(Intent(context, HomeActivity::class.java))
-                        (context as? ForgetPassEmailSendActivity)?.finish()
-                    } else {
-                        showShortToast(context, "Email ainda não foi verificado!")
-                    }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .width(331.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6A707C),
-                disabledContainerColor = Color(0xFF6A707C).copy(alpha = 0.5f),
-                contentColor = Color.White,
-                disabledContentColor = Color.White.copy(alpha = 0.5f)
-            ),
-            shape = RoundedCornerShape(size = 80.dp),
-            enabled = !isLoading
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = Color.White
-                )
-            } else {
-                Text(
-                    text = "Já verifiquei meu email",
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontFamily = FontFamily(Font(R.font.urbanist)),
-                        fontWeight = FontWeight(600),
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                    )
-                )
-            }
-        }
-
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Botão "Voltar ao Login"

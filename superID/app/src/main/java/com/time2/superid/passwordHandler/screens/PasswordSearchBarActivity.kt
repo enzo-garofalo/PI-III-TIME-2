@@ -17,7 +17,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.time2.superid.R
 import com.time2.superid.ui.theme.PurplePrimary
 import com.time2.superid.ui.theme.GreyStroke
 import com.time2.superid.ui.theme.GreyBackground
@@ -42,6 +45,7 @@ fun PasswordSearchBar(
             placeholder = {
                 Text(
                     text = "Buscar senhas...",
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Black.copy(alpha = 0.6f)
                 )
