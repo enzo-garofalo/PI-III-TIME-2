@@ -7,9 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,11 +20,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.learningui_ux.components.buildBottomBar
 import com.time2.learningui_ux.components.buildBottomModal
-import com.time2.learningui_ux.components.buildCategoryHeader
 import com.time2.learningui_ux.components.buildFloatingActionButton
 import com.time2.learningui_ux.components.buildMyPasswordHeader
 import com.time2.learningui_ux.components.buildTopAppBar
-import com.time2.learningui_ux.components.showCategoryElements
 import com.time2.learningui_ux.components.showPasswordList
 import com.time2.superid.HomeActivity
 import com.time2.superid.accountsHandler.UserAccountsManager
@@ -37,14 +33,11 @@ import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import kotlinx.coroutines.launch
 
-class AllPasswordsActivity : ComponentActivity()
-{
+class AllPasswordsActivity : ComponentActivity() {
     private val auth: FirebaseAuth = Firebase.auth
     private val userAccountsManager = UserAccountsManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         setContent {
             SuperIDTheme {
@@ -52,25 +45,40 @@ class AllPasswordsActivity : ComponentActivity()
                 var showModal by remember { mutableStateOf(false) }
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
-
+                var searchQuery by remember { mutableStateOf("") }
                 val passwordManager = PasswordManager()
-                val userPassworsList = remember { mutableStateOf<List<Password>>(emptyList()) }
-                val reloadPasswords : () -> Unit = {
+                val allPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
+                val filteredPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
+
+                // Function to reload passwords
+                val reloadPasswords: () -> Unit = {
                     coroutineScope.launch {
                         val passwordList = passwordManager.getPasswords()
-                        userPassworsList.value = passwordList
+                        allPasswords.value = passwordList
+                        filteredPasswords.value = passwordList // Initially, show all passwords
                     }
                 }
 
-                // Carregamento Inicial
+                // Handle search query changes
+                val onSearchQueryChange: (String) -> Unit = { query ->
+                    searchQuery = query
+                    filteredPasswords.value = if (query.isBlank()) {
+                        allPasswords.value // Show all passwords if query is empty
+                    } else {
+                        allPasswords.value.filter { password ->
+                            password.passwordTitle.contains(query, ignoreCase = true) ||
+                                    password.partnerSite.contains(query, ignoreCase = true)
+                        }
+                    }
+                }
+
+                // Initial data loading
                 LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
                         userName = name
                         isLoading = false
                     }
-
                     reloadPasswords()
-                    //reloadCategories()
                 }
 
                 Scaffold(
@@ -88,7 +96,7 @@ class AllPasswordsActivity : ComponentActivity()
                                 auth.signOut()
                                 startActivity(Intent(this@AllPasswordsActivity, LoginActivity::class.java))
                                 finish()
-                            },
+                            }
                         )
                     },
                     bottomBar = {
@@ -101,20 +109,29 @@ class AllPasswordsActivity : ComponentActivity()
                     }
                 ) { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
-                        // Main screen content
-
-                        buildMyPasswordHeader(
-                            onAllFilterClick = {/*TODO*/},
-                            onRecentClick = {/*TODO*/}
+                        // Imported PasswordSearchBar
+                        PasswordSearchBar(
+                            searchQuery = searchQuery,
+                            onSearchQueryChange = onSearchQueryChange,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        showPasswordList(userPassworsList)
+
+                        // Password header
+                        buildMyPasswordHeader(
+                            onAllFilterClick = { reloadPasswords() },
+                            onRecentClick = {
+                                filteredPasswords.value = allPasswords.value.sortedByDescending { it.lastUpdated }
+                            }
+                        )
+
+                        // Password list
+                        showPasswordList(filteredPasswords)
                     }
 
                     if (showModal) {
                         buildBottomModal(
                             onDismiss = {
                                 showModal = false
-                                // reloadCategories()
                                 reloadPasswords()
                             },
                             currentModal = "menu"
