@@ -76,17 +76,6 @@ fun buildTopAppBar(
                 }
             }
         }
-//        actions = {
-//            IconButton(
-//                onClick = onLogoutClick
-//            ){
-//                Icon(
-//                    painter = painterResource(id = R.drawable.logout),
-//                    contentDescription = "Sair",
-//                    tint = Color.Unspecified
-//                )
-//            }
-//        }
     )
 
 }
