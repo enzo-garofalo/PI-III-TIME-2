@@ -20,7 +20,6 @@ data class Password(
     val categoryId:  String = "",
     val description: String = "",
     val accessToken: String = "",
-    val type: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val lastUpdated: Timestamp = Timestamp.now()
 )
@@ -53,11 +52,7 @@ class PasswordManager {
         username: String = "",
         password: String = "",
         categoryId:  String = "",
-        description: String = "",
-        // accessToken: String = "", // Gerado aqui na function
-        type: String = "web"
-        // createdAt: Timestamp,
-        // lastUpdated: Timestamp
+        description: String = ""
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false.also {
             Log.e("PasswordManager", "Usuário não autenticado ao criar senha")
@@ -83,7 +78,6 @@ class PasswordManager {
                 categoryId = categoryId,
                 description = description,
                 accessToken = accessToken,
-                type = "web",
                 createdAt = Timestamp.now(),
                 lastUpdated = Timestamp.now()
             )
