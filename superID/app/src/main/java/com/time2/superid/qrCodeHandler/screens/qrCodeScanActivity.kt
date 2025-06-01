@@ -58,12 +58,13 @@ class qrCodeScanActivity : ComponentActivity() {
                     onScanQrCode = { loginToken ->
                         lifecycleScope.launch {
                             try {
-                                val partnerSite = qrCodeManager.processLoginToken(loginToken)
+                                val docId = intent.getStringExtra("docId") ?: throw Exception("ID do documento não fornecido")
+                                val partnerSite = qrCodeManager.processLoginToken(loginToken, docId)
                                 // Navega para a tela de sucesso, passando o partnerSite
                                 startActivity(
                                     Intent(this@qrCodeScanActivity, SinglePasswordActivity::class.java).apply {
                                         putExtra("partnerSite", partnerSite)
-                                        putExtra("docId", intent.getStringExtra("docId") ?: "")
+                                        putExtra("docId", docId)
                                     }
                                 )
                                 finish()

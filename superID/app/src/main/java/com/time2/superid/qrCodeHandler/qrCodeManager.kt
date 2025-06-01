@@ -13,11 +13,11 @@ class qrCodeManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     // Processa o loginToken
-    suspend fun processLoginToken(loginToken: String): String {
+    suspend fun processLoginToken(loginToken: String, docId: String): String {
         // Verifica se o usuário está logado
         val userUID = auth.currentUser?.uid ?: throw Exception("Usuário não está logado")
 
-        // Obtém a referência do documento na coleção login
+        // da um get para obter a ref do documento na coleção login
         val loginDocRef = firestore.collection("login").document(loginToken)
         val loginDoc = loginDocRef.get().await()
 
@@ -28,25 +28,29 @@ class qrCodeManager {
         // Obtém o partnerSite do documento login
         val partnerSite = loginDoc.getString("partnerSite") ?: throw Exception("Site parceiro não encontrado no token")
 
-        // Busca o documento correspondente na coleção userPasswords
-        val passwordQuery = firestore.collection("userPasswords")
+        // Busca o documento específico na coleção userPasswords usando o docId
+        val passwordDocRef = firestore.collection("userPasswords")
             .document(userUID)
             .collection("passwords")
-            .whereEqualTo("partnerSite", partnerSite)
-            .get()
-            .await()
+            .document(docId)
+        val passwordDoc = passwordDocRef.get().await()
 
-        if (passwordQuery.isEmpty) {
-            throw Exception("Nenhuma senha encontrada para o site parceiro")
+        if (!passwordDoc.exists()) {
+            throw Exception("Senha não encontrada para o docId fornecido")
         }
 
-        // Assume que há apenas um documento correspondente
-        val passwordDoc = passwordQuery.documents.first()
+        // Verifica se o partnerSite do documento corresponde ao do loginToken
+        val docPartnerSite = passwordDoc.getString("partnerSite") ?: throw Exception("Site parceiro não encontrado na senha")
+        if (docPartnerSite != partnerSite) {
+            throw Exception("O site parceiro da senha não corresponde ao do token de login")
+        }
+
+        // Extrai os dados do documento
         val username = passwordDoc.getString("username") ?: ""
         val encryptedPassword = passwordDoc.getString("password") ?: throw Exception("Senha não encontrada")
         val passwordId = passwordDoc.id
 
-        // Atualiza o documento na coleção login com tipo explícito
+        // Atualiza o documento na coleção login
         val loginUpdates: HashMap<String, Any> = hashMapOf(
             "userUID" to userUID,
             "username" to username,
@@ -58,15 +62,11 @@ class qrCodeManager {
         // Gera um novo accessToken
         val newAccessToken = TokenUtils.generateAccessToken()
 
-        // Atualiza o accessToken e lastUpdated na coleção userPasswords
+        // Atualiza o accessToken e lastUpdated (indicador de quando o accesstoken foi atualizado) na coleção userPasswords
         val passwordUpdates: HashMap<String, Any> = hashMapOf(
             "accessToken" to newAccessToken,
             "lastUpdated" to Date()
         )
-        val passwordDocRef = firestore.collection("userPasswords")
-            .document(userUID)
-            .collection("passwords")
-            .document(passwordId)
         passwordDocRef.update(passwordUpdates).await()
 
         return partnerSite
