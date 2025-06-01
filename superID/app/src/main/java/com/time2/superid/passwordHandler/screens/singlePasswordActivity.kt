@@ -64,6 +64,8 @@ class SinglePasswordActivity : ComponentActivity()
 
                 var password by remember { mutableStateOf<Password?>(null) }
                 val docId = intent.getStringExtra("docId")
+                val partnerSite = intent.getStringExtra("partnerSite") // Captura o partnerSite
+                var showSuccessModal by remember { mutableStateOf(partnerSite != null) } // Exibe modal se partnerSite existir
 
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
@@ -121,12 +123,20 @@ class SinglePasswordActivity : ComponentActivity()
                     }
                 }
 
-                if(showDeletePasswordModal){
-                 buildBottomModal(
-                     onDismiss = { showDeletePasswordModal = false },
-                     currentModal = "deletePassword",
-                     password = password
-                 )
+                if (showDeletePasswordModal) {
+                    buildBottomModal(
+                        onDismiss = { showDeletePasswordModal = false },
+                        currentModal = "deletePassword",
+                        password = password
+                    )
+                }
+
+                if (showSuccessModal) {
+                    buildBottomModal(
+                        onDismiss = { showSuccessModal = false },
+                        currentModal = "successScan",
+                        partnerSite = partnerSite
+                    )
                 }
             }
         }
@@ -223,14 +233,20 @@ fun SinglePasswordCompose(
             }
 
             Button(
-                onClick = { context.startActivity(Intent(context, qrCodeScanActivity::class.java)) },
+                onClick = {
+                    context.startActivity(
+                        Intent(context, qrCodeScanActivity::class.java).apply {
+                            putExtra("docId", password.id) // Passa o docId da senha atual
+                        }
+                    )
+                },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(53.dp)
             ) {
                 Text(
-                    text = "Escanear QRcode",
+                    text = "Escanear qrCode",
                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                 )
             }

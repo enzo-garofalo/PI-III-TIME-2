@@ -63,6 +63,7 @@ class qrCodeScanActivity : ComponentActivity() {
                                 startActivity(
                                     Intent(this@qrCodeScanActivity, HomeActivity::class.java).apply {
                                         putExtra("partnerSite", partnerSite)
+                                        putExtra("docId", intent.getStringExtra("docId") ?: "")
                                     }
                                 )
                                 finish()

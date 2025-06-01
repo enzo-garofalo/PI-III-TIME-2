@@ -21,6 +21,7 @@ import com.time2.superid.categoryHandler.screens.registerCategoryContent
 import com.time2.superid.passwordHandler.screens.deletePasswordContent
 import com.time2.superid.passwordHandler.screens.registerPasswordContent
 import com.time2.superid.ui.components.bottomModalComponents.successContent
+import com.time2.superid.ui.components.bottomModalComponents.successScanContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +29,8 @@ fun buildBottomModal(
     onDismiss : () -> Unit,
     currentModal : String,
     password : Password? = null,
-    category : Category? = null
+    category : Category? = null,
+    partnerSite: String? = null
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -99,6 +101,10 @@ fun buildBottomModal(
             )
 
             "success" -> successContent(
+                onClose = onDismiss
+            )
+
+            "successScan" -> successScanContent(
                 onClose = onDismiss
             )
         }
