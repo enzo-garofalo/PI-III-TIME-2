@@ -218,7 +218,7 @@ class CategoryManager {
                 description = "Meus sites web",
                 iconName = CategoryIcon.WEB.name,
                 isDefault = true,
-                isDeletable = true
+                isDeletable = false
             ),
             Category(
                 title = "NumPad",

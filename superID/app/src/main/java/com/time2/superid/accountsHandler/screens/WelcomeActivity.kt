@@ -41,7 +41,6 @@ class WelcomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         // Controla visibilidade das barras do sistema
         WindowInsetsControllerCompat(window, window.decorView).apply {

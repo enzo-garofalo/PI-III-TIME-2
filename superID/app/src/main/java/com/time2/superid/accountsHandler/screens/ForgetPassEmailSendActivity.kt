@@ -25,7 +25,6 @@ import com.time2.superid.ui.theme.SuperIDTheme
 class ForgetPassEmailSendActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SuperIDTheme {
                 ForgetPassEmailSendScreen()

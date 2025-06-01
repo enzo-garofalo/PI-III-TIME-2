@@ -43,7 +43,6 @@ import com.time2.superid.ui.theme.SuperIDTheme
 class TermsOfUseActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SuperIDTheme {
                 TermsOfUseView()
@@ -59,7 +58,7 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(35.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-            .padding(start = 21.dp, top = 60.dp, end = 21.dp, bottom = 31.dp)
+            .padding(start = 21.dp, top = 30.dp, end = 21.dp, bottom = 31.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Box(
