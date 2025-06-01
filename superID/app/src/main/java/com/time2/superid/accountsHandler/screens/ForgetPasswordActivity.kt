@@ -28,7 +28,6 @@ import com.time2.superid.ui.theme.SuperIDTheme
 class ForgetPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SuperIDTheme {
                 ForgetPasswordScreen()

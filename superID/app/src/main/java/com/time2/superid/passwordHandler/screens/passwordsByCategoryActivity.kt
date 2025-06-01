@@ -47,7 +47,6 @@ class PasswordsByCategoryActivity : ComponentActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             com.time2.superid.ui.theme.SuperIDTheme {
 

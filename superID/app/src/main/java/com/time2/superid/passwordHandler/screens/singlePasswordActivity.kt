@@ -59,7 +59,6 @@ class SinglePasswordActivity : ComponentActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SuperIDTheme {
                 val coroutineScope = rememberCoroutineScope()

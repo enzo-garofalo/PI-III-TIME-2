@@ -67,7 +67,7 @@ class AllPasswordsActivity : ComponentActivity() {
                     } else {
                         allPasswords.value.filter { password ->
                             password.passwordTitle.contains(query, ignoreCase = true) ||
-                                    password.partnerSite.contains(query, ignoreCase = true)
+                                    password.partnerSite!!.contains(query, ignoreCase = true)
                         }
                     }
                 }
