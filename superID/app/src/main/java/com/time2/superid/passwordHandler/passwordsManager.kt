@@ -155,7 +155,7 @@ class PasswordManager {
                     Password(
                         id            = data["id"] as? String ?: doc.id,
                         categoryId    = data["categoryId"] as? String ?: "",
-                        partnerSite   = data["partnerSite"] as? String ?: "",
+                        partnerSite   = data["partnerSite"] as? String,
                         username      = data["username"] as? String ?: "",
                         password      = data["password"] as? String ?: "",
                         passwordTitle = data["passwordTitle"] as? String ?: "",
@@ -185,7 +185,7 @@ class PasswordManager {
                 Password(
                     id = passwordId,
                     categoryId  = data["categoryId"] as? String ?: "",
-                    partnerSite = data["partnerSite"] as? String ?: "",
+                    partnerSite = data["partnerSite"] as? String,
                     username = data["username"] as? String ?: "",
                     password = data["password"] as? String ?: "",
                     passwordTitle = data["passwordTitle"] as? String ?: "",
@@ -237,7 +237,7 @@ class PasswordManager {
                 description = newDescription ?: password.description,
                 passwordTitle = newPasswordTitle ?: password.passwordTitle,
                 categoryId = newCategory ?: password.categoryId,
-                partnerSite = newPartnerSite ?: password.partnerSite,
+                partnerSite = newPartnerSite,
                 accessToken = refreshAccessToken(password.id).toString(),
                 lastUpdated = Timestamp.now()
             )

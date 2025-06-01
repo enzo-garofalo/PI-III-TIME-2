@@ -38,6 +38,7 @@ import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.ui.components.structure.CustomCategorySelectField
+import com.time2.superid.ui.components.structure.CustomPartnerSiteSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
@@ -87,7 +88,7 @@ fun editPasswordContent(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
-            .fillMaxHeight(0.9f)
+            .fillMaxHeight(0.95f)
             .heightIn(min = 500.dp)
     ) {
 
@@ -106,6 +107,8 @@ fun editPasswordContent(
             // Estados dos campos de entrada
             var username by remember { mutableStateOf(password.username) }
             var passwodTitle by remember { mutableStateOf(password.passwordTitle) }
+            var partnerSite by remember { mutableStateOf(password.partnerSite) }
+
 
             val pm = PasswordManager()
             val decrypted = pm.decryptPassword(password.password)
@@ -134,14 +137,6 @@ fun editPasswordContent(
 
             // Formulário de entrada com campos personalizados
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-//                CustomTextField(
-//                    label = "* Site/Serviço:",
-//                    isSingleLine = true,
-//                    value = partnerSite,
-//                    onValueChange = { partnerSite = it },
-//                    isPassword = false
-//                )
-                //
 
                 CustomTextField(
                     label = "* Site/Serviço:",
@@ -186,8 +181,16 @@ fun editPasswordContent(
                     }
                 )
 
+                val partnerSites = passMan.getPartnerSiteURLsList()
 
-
+                CustomPartnerSiteSelectField(
+                    label = "Site parceiro do superID",
+                    options = partnerSites,
+                    selectedOption =  partnerSite,
+                    onOptionSelected = { selected ->
+                        partnerSite = if (selected == "Não é site parceiro do superID") null else selected
+                    }
+                )
 
                 CustomTextField(
                     label = "Descrição:",
@@ -221,7 +224,7 @@ fun editPasswordContent(
                                 newDescription = description,
                                 newPasswordTitle = passwodTitle,
                                 newCategory = category.id,
-                                newPartnerSite = password.partnerSite
+                                newPartnerSite = partnerSite
                             )
 
                             withContext(Dispatchers.Main) {

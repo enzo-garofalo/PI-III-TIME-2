@@ -177,6 +177,16 @@ fun SinglePasswordCompose(
                 enabled = false
             )
 
+            
+            CustomTextField(
+                label = "Site parceiro do superID:",
+                isSingleLine = true,
+                value = password.partnerSite ?: "Não é parceiro do superID",
+                onValueChange = { /*Nothing To do here*/ },
+                isPassword = false,
+                enabled = false
+            )
+
             CustomTextField(
                 label = "Descrição",
                 isSingleLine = false,
@@ -185,6 +195,7 @@ fun SinglePasswordCompose(
                 isPassword = false,
                 enabled = false
             )
+
 
             // A instândia com remember impede que ele seja recriado a cada recomposição
             val catMan = remember { CategoryManager() }
@@ -232,7 +243,7 @@ fun SinglePasswordCompose(
                     .height(53.dp)
             ) {
                 Text(
-                    text = "Atualizar minha conta",
+                    text = "Atualizar minha senha",
                     fontFamily = FontFamily(Font(R.font.urbanist_medium))
                 )
             }

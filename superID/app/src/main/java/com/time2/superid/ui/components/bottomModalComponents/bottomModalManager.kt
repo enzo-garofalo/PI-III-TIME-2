@@ -36,7 +36,10 @@ fun buildBottomModal(
     var currentModal by remember { mutableStateOf(currentModal) }
 
     LaunchedEffect(currentModal) {
-        if (currentModal == "password" || currentModal == "category" || currentModal == "menu") {
+        if (currentModal == "password"
+            || currentModal == "category"
+            || currentModal == "menu"
+            || currentModal == "editPassword") {
             sheetState.expand()
         }else if(currentModal == "success"){
             sheetState.show()
