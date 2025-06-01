@@ -34,7 +34,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.runtime.remember
-import com.time2.superid.HomeActivity
+import com.time2.superid.passwordHandler.screens.SinglePasswordActivity
 import com.time2.superid.ui.theme.SuperIDTheme
 
 class qrCodeScanActivity : ComponentActivity() {
@@ -54,14 +54,14 @@ class qrCodeScanActivity : ComponentActivity() {
 
         setContent {
             SuperIDTheme {
-                SinglePasswordView(
+                qrCodeScanView(
                     onScanQrCode = { loginToken ->
                         lifecycleScope.launch {
                             try {
                                 val partnerSite = qrCodeManager.processLoginToken(loginToken)
                                 // Navega para a tela de sucesso, passando o partnerSite
                                 startActivity(
-                                    Intent(this@qrCodeScanActivity, HomeActivity::class.java).apply {
+                                    Intent(this@qrCodeScanActivity, SinglePasswordActivity::class.java).apply {
                                         putExtra("partnerSite", partnerSite)
                                         putExtra("docId", intent.getStringExtra("docId") ?: "")
                                     }
@@ -79,7 +79,7 @@ class qrCodeScanActivity : ComponentActivity() {
 }
 
 @Composable
-fun SinglePasswordView(
+fun qrCodeScanView(
     onScanQrCode: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
