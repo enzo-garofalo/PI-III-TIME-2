@@ -2,19 +2,19 @@ package com.time2.superid.passwordHandler.screens
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -39,7 +40,6 @@ import com.time2.superid.HomeActivity
 import com.time2.superid.R
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
-import com.time2.superid.accountsHandler.screens.SignUpActivity
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
@@ -147,17 +147,20 @@ class SinglePasswordActivity : ComponentActivity()
     }
 }
 
-
 @Composable
 fun SinglePasswordCompose(
     password: Password,
     onDeleteClick: () -> Unit,
     onReloadTrigger: () -> Unit
-){
+) {
     var showEditModal by remember { mutableStateOf(false) }
+    var showMasterPasswordModal by remember { mutableStateOf(false) } // Novo estado para o modal
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val auth: FirebaseAuth = Firebase.auth
+    val userAccountsManager = remember { UserAccountsManager() }
 
-    Column{
+    Column {
         buildSinglePasswordHeader(
             onDeleteClick = onDeleteClick,
             title = password.passwordTitle
@@ -169,7 +172,6 @@ fun SinglePasswordCompose(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             CustomTextField(
                 label = "Login",
                 isSingleLine = true,
@@ -191,7 +193,6 @@ fun SinglePasswordCompose(
                 enabled = false
             )
 
-            
             CustomTextField(
                 label = "Site parceiro do superID:",
                 isSingleLine = true,
@@ -210,18 +211,13 @@ fun SinglePasswordCompose(
                 enabled = false
             )
 
-
-            // A instândia com remember impede que ele seja recriado a cada recomposição
             val catMan = remember { CategoryManager() }
             var category by remember { mutableStateOf<Category?>(null) }
 
-
-            // Executa o código dentro dele quando o valor password.categoryId muda
             LaunchedEffect(key1 = password.categoryId) {
                 category = catMan.getCategoryById(password.categoryId)
             }
 
-            //  Verifica se category é diferente de null
             category?.let { currentCategory ->
                 val categElement = Element(
                     isPassword = false,
@@ -232,18 +228,11 @@ fun SinglePasswordCompose(
                 )
                 elementButton(categElement)
             } ?: run {
-
                 Text("Loading category…")
             }
 
             Button(
-                onClick = {
-                    context.startActivity(
-                        Intent(context, qrCodeScanActivity::class.java).apply {
-                            putExtra("docId", password.id) // Passa o docId da senha atual
-                        }
-                    )
-                },
+                onClick = { showMasterPasswordModal = true }, // Exibe o modal em vez de iniciar a activity diretamente
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -280,4 +269,127 @@ fun SinglePasswordCompose(
             password = password
         )
     }
+
+    if (showMasterPasswordModal) {
+        MasterPasswordModal(
+            onDismiss = { showMasterPasswordModal = false },
+            onConfirm = { masterPassword, setError ->
+                coroutineScope.launch {
+                    if (masterPassword.isBlank()) {
+                        setError("Por favor, insira a senha.")
+                        return@launch
+                    }
+
+                    // Verifica se o email está verificado
+                    userAccountsManager.checkEmailVerification { isVerified ->
+                        if (!isVerified) {
+                            setError("Email não verificado. Verifique seu email para continuar.")
+                            return@checkEmailVerification
+                        }
+
+                        val user = auth.currentUser
+                        if (user != null) {
+                            val credential = EmailAuthProvider.getCredential(user.email!!, masterPassword)
+                            user.reauthenticate(credential)
+                                .addOnSuccessListener {
+                                    // reautentication bem-sucedida, inicia o qrCodeScan
+                                    context.startActivity(
+                                        Intent(context, qrCodeScanActivity::class.java).apply {
+                                            putExtra("docId", password.id) // docID da senha atual, usado para voltar
+                                        }
+                                    )
+                                    showMasterPasswordModal = false
+                                }
+                                .addOnFailureListener { e ->
+                                    setError("Senha inválida, tente novamente.")
+                                }
+                        } else {
+                            setError("Nenhum usuário logado.")
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun MasterPasswordModal(
+    onDismiss: () -> Unit,
+    onConfirm: (String, (String?) -> Unit) -> Unit // aceitando callback de erro
+) {
+    val masterPassword = remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Digite sua senha mestra para continuar",
+                fontFamily = FontFamily(Font(R.font.urbanist_regular))
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+
+                Text (
+                    text = "*Senha usada para criar a sua conta",
+                    color = androidx.compose.ui.graphics.Color.Black,
+                    fontFamily = FontFamily(Font(R.font.urbanist_regular)),
+                    modifier = Modifier.padding(top = 0.dp)
+                )
+
+                CustomTextField(
+                    label = "Senha Mestra",
+                    isSingleLine = true,
+                    value = masterPassword.value,
+                    onValueChange = {
+                        masterPassword.value = it
+                        errorMessage = null
+                    },
+                    isPassword = true,
+                    enabled = true
+                )
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = androidx.compose.ui.graphics.Color.Red,
+                        fontFamily = FontFamily(Font(R.font.urbanist_medium)),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (masterPassword.value.isBlank()) {
+                        errorMessage = "Por favor, insira a senha."
+                    } else {
+                        onConfirm(masterPassword.value) { error ->
+                            errorMessage = error
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(50),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Confirmar",
+                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "Cancelar",
+                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                )
+            }
+        }
+    )
 }
