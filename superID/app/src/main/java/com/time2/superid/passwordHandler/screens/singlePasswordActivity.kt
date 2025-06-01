@@ -323,7 +323,12 @@ fun MasterPasswordModal(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Digite sua senha mestra para continuar") },
+        title = {
+            Text(
+                text = "Digite sua senha mestra para continuar",
+                fontFamily = FontFamily(Font(R.font.urbanist_regular))
+            )
+        },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
