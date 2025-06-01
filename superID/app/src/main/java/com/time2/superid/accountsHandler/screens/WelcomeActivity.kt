@@ -42,6 +42,7 @@ class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         // Controla visibilidade das barras do sistema
         WindowInsetsControllerCompat(window, window.decorView).apply {
             // Oculta a barra de menu
@@ -52,8 +53,7 @@ class WelcomeActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        // Cor de fundo da barra de notificação
-        window.statusBarColor = android.graphics.Color.BLACK
+
 
         if (redirectIfLogged(this)) return
 
