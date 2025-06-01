@@ -10,6 +10,7 @@ import com.google.firebase.ktx.Firebase
 import com.time2.superid.HomeActivity
 import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
+import com.time2.superid.accountsHandler.screens.TermsOfUseActivity
 import com.time2.superid.settingsHandler.screens.SettingsScreen
 import com.time2.superid.ui.theme.SuperIDTheme
 
@@ -34,6 +35,9 @@ class SettingsActivity : ComponentActivity() {
                         auth.signOut()
                         startActivity(Intent(this@SettingsActivity, LoginActivity::class.java))
                         finish()
+                    },
+                    onReadTermsClick = {
+                        startActivity(Intent(this@SettingsActivity, TermsOfUseActivity::class.java))
                     }
                 )
             }

@@ -37,6 +37,7 @@ import com.time2.learningui_ux.components.buildBottomBar
 import com.time2.learningui_ux.components.buildTopAppBar
 import android.app.Activity
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
 
 
@@ -46,7 +47,8 @@ fun SettingsScreen(
     auth: FirebaseAuth,
     userAccountsManager: UserAccountsManager,
     onBack: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onReadTermsClick: () -> Unit
 ) {
     var showModal by remember { mutableStateOf(false) }
     var userName  by remember { mutableStateOf("Carregando...") }
@@ -75,7 +77,8 @@ fun SettingsScreen(
         SettingsContent(
             modifier = Modifier.padding(innerPadding),
             userName = userName,
-            onLogoutClick = { showModal = true }
+            onLogoutClick = { showModal = true },
+            onReadTermsClick = { onReadTermsClick() }
         )
     }
 
@@ -92,7 +95,8 @@ fun SettingsScreen(
 fun SettingsContent(
     modifier: Modifier = Modifier,
     userName: String,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onReadTermsClick: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -133,6 +137,22 @@ fun SettingsContent(
                 text = "Logout",
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(R.font.urbanist_medium))
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(
+            onClick = {
+                onReadTermsClick()
+            }
+        ) {
+            Text(
+                text = "Ler Termos de Uso",
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist_regular)),
+                color = Color.Gray
             )
         }
     }

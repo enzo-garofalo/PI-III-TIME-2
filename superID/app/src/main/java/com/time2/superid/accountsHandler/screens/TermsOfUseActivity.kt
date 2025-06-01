@@ -1,5 +1,6 @@
 package com.time2.superid.accountsHandler.screens
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -65,7 +66,11 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(34.dp)
                 .border(width = 1.dp, color = Color(0xFF4500C9), shape = CircleShape)
-                .clickable { context.startActivity(Intent(context, SignUpActivity::class.java)) }
+                .clickable {
+                    if( context is Activity){
+                        context.finish()
+                    }
+                }
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
@@ -223,7 +228,11 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
         }
 
         Button(
-            onClick = {context.startActivity(Intent(context, SignUpActivity::class.java))},
+            onClick = {
+                if( context is Activity){
+                    context.finish()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 19.dp),
@@ -236,7 +245,7 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
             shape = RoundedCornerShape(size = 80.dp)
         ) {
             Text(
-                text = "Voltar para o cadastro",
+                text = "Voltar",
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontFamily = FontFamily(Font(R.font.urbanist)),
