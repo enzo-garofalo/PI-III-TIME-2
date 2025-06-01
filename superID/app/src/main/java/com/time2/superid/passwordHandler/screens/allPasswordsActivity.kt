@@ -50,7 +50,7 @@ class AllPasswordsActivity : ComponentActivity() {
                 val allPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
                 val filteredPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
 
-                // Function to reload passwords
+
                 val reloadPasswords: () -> Unit = {
                     coroutineScope.launch {
                         val passwordList = passwordManager.getPasswords()
@@ -59,7 +59,7 @@ class AllPasswordsActivity : ComponentActivity() {
                     }
                 }
 
-                // Handle search query changes
+
                 val onSearchQueryChange: (String) -> Unit = { query ->
                     searchQuery = query
                     filteredPasswords.value = if (query.isBlank()) {
@@ -67,12 +67,12 @@ class AllPasswordsActivity : ComponentActivity() {
                     } else {
                         allPasswords.value.filter { password ->
                             password.passwordTitle.contains(query, ignoreCase = true) ||
-                                    password.partnerSite.contains(query, ignoreCase = true)
+                                    password.partnerSite!!.contains(query, ignoreCase = true)
                         }
                     }
                 }
 
-                // Initial data loading
+
                 LaunchedEffect(Unit) {
                     fetchUserProfile(auth, userAccountsManager) { name ->
                         userName = name
@@ -109,14 +109,14 @@ class AllPasswordsActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
-                        // Imported PasswordSearchBar
+
                         PasswordSearchBar(
                             searchQuery = searchQuery,
                             onSearchQueryChange = onSearchQueryChange,
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        // Password header
+
                         buildMyPasswordHeader(
                             onAllFilterClick = { reloadPasswords() },
                             onRecentClick = {
@@ -124,7 +124,7 @@ class AllPasswordsActivity : ComponentActivity() {
                             }
                         )
 
-                        // Password list
+
                         showPasswordList(filteredPasswords)
                     }
 

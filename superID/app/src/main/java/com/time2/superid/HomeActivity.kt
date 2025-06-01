@@ -45,13 +45,17 @@ class HomeActivity : ComponentActivity() {
                 var showModal by remember { mutableStateOf(false) }
                 var userName by remember { mutableStateOf("Carregando...") }
                 var isLoading by remember { mutableStateOf(true) }
+                var searchQuery by remember { mutableStateOf("") }
 
                 val passwordManager = PasswordManager()
-                val userPassworsList = remember { mutableStateOf<List<Password>>(emptyList()) }
+                val allPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
+                val displayedPasswords = remember { mutableStateOf<List<Password>>(emptyList()) }
+
                 val reloadPasswords : () -> Unit = {
                     coroutineScope.launch {
                         val passwordList = passwordManager.getPasswords()
-                        userPassworsList.value = passwordList
+                        allPasswords.value = passwordList
+                        displayedPasswords.value = passwordList // Mostrar todas as senhas por padrão
                     }
                 }
 
@@ -61,6 +65,18 @@ class HomeActivity : ComponentActivity() {
                     coroutineScope.launch {
                         val categoryList = categoryManager.getCategories()
                         userCategoryList.value = categoryList
+                    }
+                }
+
+                val onSearchQueryChange: (String) -> Unit = { query ->
+                    searchQuery = query
+                    displayedPasswords.value = if (query.isBlank()) {
+                        allPasswords.value // Show all passwords if query is empty
+                    } else {
+                        allPasswords.value.filter { password ->
+                            password.passwordTitle.contains(query, ignoreCase = true) ||
+                                    password.partnerSite!!.contains(query, ignoreCase = true)
+                        }
                     }
                 }
 
@@ -107,10 +123,18 @@ class HomeActivity : ComponentActivity() {
                         showCategoryElements(categoryList = userCategoryList.value)
 
                         buildMyPasswordHeader(
-                            onAllFilterClick = {/*TODO*/},
-                            onRecentClick = {/*TODO*/}
+                            onAllFilterClick = {
+                                // Mostrar todas as senhas
+                                displayedPasswords.value = allPasswords.value
+                            },
+                            onRecentClick = {
+                                // Mostrar senhas ordenadas por mais recente (lastUpdated)
+                                displayedPasswords.value = allPasswords.value.sortedByDescending { it.lastUpdated }
+                            }
                         )
-                        showPasswordList(userPassworsList)
+
+                        // Usar displayedPasswords ao invés de userPassworsList
+                        showPasswordList(displayedPasswords)
                     }
 
                     if (showModal) {
