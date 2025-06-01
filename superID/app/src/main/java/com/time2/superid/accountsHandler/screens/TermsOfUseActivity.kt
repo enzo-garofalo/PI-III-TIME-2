@@ -77,7 +77,7 @@ fun TermsOfUseView(modifier: Modifier = Modifier) {
             )
         }
 
-        // Column para diferenciar o espaço
+
         Column(
             verticalArrangement = Arrangement.spacedBy(23.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start,

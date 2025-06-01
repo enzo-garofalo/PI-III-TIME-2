@@ -492,7 +492,7 @@ fun SignUpView( modifier: Modifier = Modifier)
 
             Spacer(modifier = Modifier.width(7.dp))
 
-            //Botao que vai para a activity de Login
+
             Text(
                 text = "Entrar",
                 style = TextStyle(

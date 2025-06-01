@@ -78,13 +78,13 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Controla visibilidade das barras do sistema
+
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            // Oculta a barra de menu
+
             hide(WindowInsetsCompat.Type.navigationBars())
-            // Garante que a barra de notificacao permaneca visível
+
             show(WindowInsetsCompat.Type.statusBars())
-            // Define o comportamento para que a navigation bar nao reapareca com gestos
+
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
