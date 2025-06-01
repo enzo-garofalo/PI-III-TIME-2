@@ -88,9 +88,6 @@ class LoginActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        // Cor de fundo da barra de notificacao
-        window.statusBarColor = android.graphics.Color.BLACK
-
         if (redirectIfLogged(this)) return
 
         setContent {

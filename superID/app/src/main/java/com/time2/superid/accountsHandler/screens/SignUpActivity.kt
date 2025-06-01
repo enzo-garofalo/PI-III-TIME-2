@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,8 +56,6 @@ class SignUpActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        // Cor de fundo da barra de notificacao
-        window.statusBarColor = android.graphics.Color.BLACK
 
         if (redirectIfLogged(this)) return
 
@@ -162,7 +159,7 @@ fun SignUpView( modifier: Modifier = Modifier)
         // Centraliza os elementos principais
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -254,6 +251,17 @@ fun SignUpView( modifier: Modifier = Modifier)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "* Mínimo 6 caracteres",
+            style = TextStyle(
+                fontSize = 15.sp,
+                fontFamily = FontFamily(Font(R.font.urbanist)),
+                fontWeight = FontWeight(600),
+                color = Color(0xFF6A707C),
+                textAlign = TextAlign.Start
+            )
+        )
 
         // Campo de Senha
         OutlinedTextField(
@@ -457,6 +465,8 @@ fun SignUpView( modifier: Modifier = Modifier)
                 )
             }
         }
+
+
 
         Spacer(modifier = Modifier.weight(1f))
 
