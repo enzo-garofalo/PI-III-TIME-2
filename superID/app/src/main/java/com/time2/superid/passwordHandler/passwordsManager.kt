@@ -14,7 +14,7 @@ import java.security.SecureRandom
 data class Password(
     val id: String = "",
     val passwordTitle: String = "",
-    val partnerSite: String = "",
+    val partnerSite: String? = null,
     val username: String = "",
     val password: String = "",
     val categoryId:  String = "",
@@ -42,17 +42,34 @@ class PasswordManager {
             .collection("passwords")
     }
 
+    /**
+     * Obtem as urls de sites parceiros
+     */
+    fun getPartnerSiteURLsList() : List<String>{
+        val urls = mutableListOf<String>()
+        db.collection("partnersSite")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                snapshot.mapNotNullTo(urls) { it.getString("url") }
+            }
+            .addOnFailureListener { e ->
+                println("Erro ao buscar URLs: ${e.message}")
+            }
+        return urls
+    }
+
+
 
     /**
      * Cria uma nova senha na coleção do usuário autenticado.
      */
     suspend fun createPassword(
-        passwordTitle: String = "",
-        partnerSite: String = "",
-        username: String = "",
-        password: String = "",
-        categoryId:  String = "",
-        description: String = ""
+        passwordTitle : String = "",
+        partnerSite : String?  = null,
+        username    : String   = "",
+        password    : String   = "",
+        categoryId  : String   = "",
+        description : String   = ""
     ): Boolean {
         val collection = getPasswordsCollection() ?: return false.also {
             Log.e("PasswordManager", "Usuário não autenticado ao criar senha")

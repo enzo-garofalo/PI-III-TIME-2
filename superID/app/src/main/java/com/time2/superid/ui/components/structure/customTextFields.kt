@@ -45,51 +45,6 @@ import com.time2.superid.categoryHandler.Category
 import com.time2.superid.ui.components.category.getCategoryIcon
 
 @Composable
-fun emailTextField(
-    isLoading: Boolean = false,
-    onEmailChange: (String) -> Unit,
-    email : String
-) {
-    val border = colorResource(id = R.color.border_color)
-    val background = MaterialTheme.colorScheme.onTertiary
-
-    OutlinedTextField(
-        value = email,
-        onValueChange = { input ->
-            onEmailChange(input.replace(" ", "").trim())
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(66.dp),
-        singleLine = true,
-        enabled = !isLoading,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        shape = RoundedCornerShape(80.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor    = background,
-            unfocusedContainerColor  = background,
-            disabledContainerColor   = background,
-            errorContainerColor      = background,
-
-            focusedBorderColor       = border,
-            unfocusedBorderColor     = border,
-            disabledBorderColor      = border,
-            errorBorderColor         = border,
-
-        ),
-
-        label = {
-            Text(
-                "E-mail",
-                modifier = Modifier.padding(start = 12.dp),
-                style = MaterialTheme.typography.titleSmall,
-                color = Color.Gray
-            )
-        }
-    )
-}
-
-@Composable
 fun CustomTextField(
     label: String,
     isSingleLine: Boolean,
@@ -112,7 +67,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = if (!isSingleLine) 120.dp else 0.dp),
+            .defaultMinSize(minHeight = if (!isSingleLine) 100.dp else 0.dp),
         label = {
             Surface(
                 color = background, // aplica o mesmo fundo do campo ao redor da label
@@ -169,91 +124,6 @@ fun CustomTextField(
         shape = RoundedCornerShape(if (!isSingleLine) 15.dp else 80.dp),
         singleLine = isSingleLine
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomSelectField(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-) {
-    // Variáveis de cor
-    val border     = colorResource(id = R.color.border_color)
-    val background = MaterialTheme.colorScheme.onTertiary
-
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded       = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        // Text field that opens the dropdown
-        OutlinedTextField(
-            value         = selectedOption,
-            onValueChange = { /* read-only */ },
-            readOnly      = true,
-            label         = {
-                Surface(color = background) {
-                    Text(
-                        text  = label,
-                        style = TextStyle(
-                            fontSize     = 15.sp,
-                            fontFamily   = FontFamily(Font(R.font.urbanist_medium))
-                        )
-                    )
-                }
-            },
-            trailingIcon  = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier      = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
-            colors        = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor    = background,
-                unfocusedContainerColor  = background,
-                disabledContainerColor   = background,
-                errorContainerColor      = background,
-
-                focusedBorderColor       = border,
-                unfocusedBorderColor     = border,
-                disabledBorderColor      = border,
-                errorBorderColor         = border
-            ),
-            shape         = RoundedCornerShape(80.dp),
-            singleLine    = true
-        )
-
-        // The dropdown menu itself
-        ExposedDropdownMenu(
-            expanded        = expanded,
-            onDismissRequest = { expanded = false },
-            modifier        = Modifier.background(background)
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text  = option,
-                            style = TextStyle(
-                                fontSize   = 15.sp,
-                                fontFamily = FontFamily(Font(R.font.urbanist_medium))
-                            )
-                        )
-                    },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    },
-                    colors = MenuDefaults.itemColors(
-                        textColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -358,6 +228,112 @@ fun CustomCategorySelectField(
                     },
                     onClick = {
                         onOptionSelected(category)
+                        expanded = false
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomPartnerSiteSelectField(
+    label: String,
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit,
+    enabled: Boolean = true
+) {
+
+    val options = listOf("Não é site parceiro do superID") + options
+    val border = colorResource(id = R.color.border_color)
+    val background = MaterialTheme.colorScheme.onTertiary
+
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { if (enabled) expanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedOption ?: "Não é site parceiro do superID",
+            onValueChange = {},
+            enabled = enabled,
+            readOnly = true,
+            label = {
+                Surface(color = background) {
+                    Text(
+                        text = label,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                        )
+                    )
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    painter =  getCategoryIcon("generic"),
+                    contentDescription = "Ícone da categoria",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor    = background,
+                unfocusedContainerColor  = background,
+                disabledContainerColor   = background,
+                errorContainerColor      = background,
+                focusedBorderColor       = border,
+                unfocusedBorderColor     = border,
+                disabledBorderColor      = border,
+                errorBorderColor         = border
+            ),
+            shape = RoundedCornerShape(80.dp),
+            singleLine = true
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(background)
+        ) {
+            options.forEach { url ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text(
+                                text = url,
+                                style = TextStyle(
+                                    fontSize = 15.sp,
+                                    fontFamily = FontFamily(Font(R.font.urbanist_medium))
+                                )
+                            )
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = getCategoryIcon("generic"),
+                            contentDescription = "Ícone do superID",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    onClick = {
+                        onOptionSelected(url)
                         expanded = false
                     },
                     colors = MenuDefaults.itemColors(

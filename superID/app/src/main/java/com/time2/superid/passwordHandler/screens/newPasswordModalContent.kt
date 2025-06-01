@@ -45,7 +45,7 @@ import com.time2.superid.R
 import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.ui.components.structure.CustomCategorySelectField
-import com.time2.superid.ui.components.structure.CustomSelectField
+import com.time2.superid.ui.components.structure.CustomPartnerSiteSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.components.structure.buildMissingFieldsDialog
 import com.time2.superid.ui.components.utils.rememberImeState
@@ -88,13 +88,13 @@ fun registerPasswordContent(
         onDismiss = { showAlert = false }
     )
 
-    val repository = remember { PasswordManager() }
+    val passMan = remember { PasswordManager() }
 
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
-            .fillMaxHeight(0.9f)
+            .fillMaxHeight(0.95f)
             .heightIn(min = 500.dp)
     ) {
 
@@ -136,6 +136,7 @@ fun registerPasswordContent(
             // Estados dos campos de entrada
             var username by remember { mutableStateOf("") }
             var passwodTitle by remember { mutableStateOf("") }
+            var partnerSite by remember { mutableStateOf<String?>(null) }
             var password by remember { mutableStateOf("") }
             var category by remember { mutableStateOf<Category?>(null) }
             var description by remember { mutableStateOf("") }
@@ -160,15 +161,6 @@ fun registerPasswordContent(
 
             // Formulário de entrada com campos personalizados
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-//                CustomTextField(
-//                    label = "* Site/Serviço:",
-//                    isSingleLine = true,
-//                    value = partnerSite,
-//                    onValueChange = { partnerSite = it },
-//                    isPassword = false
-//                )
-                //
-
                 CustomTextField(
                     label = "* Site/Serviço:",
                     isSingleLine = true,
@@ -193,7 +185,7 @@ fun registerPasswordContent(
                     isPassword = true
                 )
 
-                val categoryManager = CategoryManager()
+                val categoryManager = remember { CategoryManager() }
                 val categories = remember { mutableStateOf<List<Category>>(emptyList()) }
                 var selectedCategoryId by remember { mutableStateOf<String?>(null) }
 
@@ -210,6 +202,16 @@ fun registerPasswordContent(
                     selectedOption = category,
                     onOptionSelected = { selected ->
                         category = selected
+                    }
+                )
+                val partnerSites = passMan.getPartnerSiteURLsList()
+
+                CustomPartnerSiteSelectField(
+                    label = "Site parceiro do superID",
+                    options = partnerSites,
+                    selectedOption =  partnerSite,
+                    onOptionSelected = { selected ->
+                        partnerSite = if (selected == "Não é site parceiro do superID") null else selected
                     }
                 )
 
@@ -236,16 +238,11 @@ fun registerPasswordContent(
                         showAlert = true
                         missingFields = missing
                     } else {
-                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                        if (user == null) {
-                            println("Usuário não autenticado.")
-                            return@Button
-                        }
 
                         CoroutineScope(Dispatchers.IO).launch {
-                            val success = repository.createPassword(
+                            val success = passMan.createPassword(
                                 passwordTitle = passwodTitle,
-                                partnerSite = "www.superidweb.com.br",
+                                partnerSite = partnerSite,
                                 username = username,
                                 password = password,
                                 categoryId = category!!.id,

@@ -81,7 +81,7 @@ fun editPasswordContent(
         onDismiss = { showAlert = false }
     )
 
-    val repository = remember { PasswordManager() }
+    val passMan = remember { PasswordManager() }
 
     Column(
         modifier = Modifier
@@ -187,6 +187,8 @@ fun editPasswordContent(
                 )
 
 
+
+
                 CustomTextField(
                     label = "Descrição:",
                     isSingleLine = false,
@@ -209,23 +211,17 @@ fun editPasswordContent(
                         showAlert = true
                         missingFields = missing
                     } else {
-                        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                        if (user == null) {
-                            // Aqui você pode mostrar uma mensagem de erro
-                            println("Usuário não autenticado.")
-                            return@Button
-                        }
 
                         CoroutineScope(Dispatchers.IO).launch {
 
-                            val success = repository.updatePassword(
+                            val success = passMan.updatePassword(
                                 password = password,
                                 newUsername = username,
                                 newPassword = passwordToedit,
                                 newDescription = description,
                                 newPasswordTitle = passwodTitle,
                                 newCategory = category.id,
-                                newPartnerSite = password.partnerSite // substitua por uma variável se quiser editar
+                                newPartnerSite = password.partnerSite
                             )
 
                             withContext(Dispatchers.Main) {
