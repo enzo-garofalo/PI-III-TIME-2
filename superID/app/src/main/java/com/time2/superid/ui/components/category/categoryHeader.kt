@@ -49,16 +49,6 @@ fun buildCategoryHeader(
                 color = Color.Black
             )
         }
-
-        IconButton(
-            onClick = onSettingsClick
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_preference),
-                contentDescription = "Configurações de categoria",
-                tint = MaterialTheme.colorScheme.primary // Purple
-            )
-        }
     }
 }
 
