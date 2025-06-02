@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -105,7 +104,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "O SuperID é uma forma inovadora de fazer login em sites e serviços sem precisar de senhas, trazendo praticidade e segurança para o seu dia a dia. Além disso, ele permite que você armazene suas senhas tradicionais de maneira segura, organizando-as de forma simples e acessível.",
+            text = "O SuperID é uma solução revolucionária que simplifica o acesso a sites e serviços por meio do escaneamento de QR codes, eliminando a necessidade de senhas tradicionais e oferecendo praticidade e segurança no seu dia a dia. Com ele, você pode armazenar todas as suas senhas de forma segura dentro do aplicativo, organizando-as de maneira intuitiva e acessível para uma experiência mais fluida e protegida.",
             style = TextStyle (
                 fontSize = 15.sp,
                 lineHeight = 22.5.sp,
