@@ -23,6 +23,14 @@ O **SuperID** é um aplicativo Android desenvolvido nativamente em **Kotlin**, p
 
 ---
 
+## 🌐 Site Parceiro
+
+O **SuperID** possui um site parceiro, o **Webpi**, que foi desenvolvido para interagir diretamente com o aplicativo, permitindo a autenticação via QR Code em uma plataforma web. Confira o repositório do site:
+
+- **Repositório Webpi**: [https://github.com/jgabrieldsl/webpi](https://github.com/jgabrieldsl/webpi)
+
+---
+
 ## ⚙️ Aspectos Técnicos
 
 ### 🔧 Tecnologias e Ferramentas
@@ -60,7 +68,7 @@ Commits seguem o padrão **Conventional Commits** para maior clareza e rastreabi
 
 1. Clone este repositório:  
    ```bash
-   git clone https://github.com/seu-usuario/superid.git
+   git clone https://github.com/enzo-garofalo/PI-III-TIME-2.git
    ```
 2. Acesse a branch `develop` para a versão mais recente do desenvolvimento:  
    ```bash
@@ -113,5 +121,3 @@ Consulte o arquivo `build.gradle.kts` completo para detalhes.
 ---
 
 > Feito com 💜 por alunos comprometidos com a inovação em segurança digital.
-
----
