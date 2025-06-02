@@ -60,21 +60,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.time2.superid.R
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ForgetPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
 
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.navigationBars())
             show(WindowInsetsCompat.Type.statusBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
-
-        window.statusBarColor = android.graphics.Color.BLACK
 
         setContent {
             MaterialTheme(
@@ -90,13 +86,14 @@ class ForgetPasswordActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun ForgetPasswordScreen() {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val db = FirebaseFirestore.getInstance()
 
     Column(
         modifier = Modifier
@@ -106,7 +103,6 @@ fun ForgetPasswordScreen() {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.Start
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start,
@@ -125,7 +121,6 @@ fun ForgetPasswordScreen() {
             }
         }
 
-
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
@@ -136,7 +131,7 @@ fun ForgetPasswordScreen() {
                 fontFamily = FontFamily(Font(R.font.urbanist)),
                 fontWeight = FontWeight(700),
                 color = Color(0xFF1E232C),
-                textAlign = TextAlign.Left,
+                textAlign = TextAlign.Left
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -144,7 +139,6 @@ fun ForgetPasswordScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-
 
         Text(
             text = "Não se preocupe! Isso acontece. Insira o endereço de e-mail vinculado à sua conta.",
@@ -154,13 +148,12 @@ fun ForgetPasswordScreen() {
                 fontFamily = FontFamily(Font(R.font.urbanist)),
                 fontWeight = FontWeight(400),
                 color = Color(0xFF8391A1),
-                textAlign = TextAlign.Left,
+                textAlign = TextAlign.Left
             ),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         Text(
             text = "* Campo obrigatório!",
@@ -170,7 +163,7 @@ fun ForgetPasswordScreen() {
                 fontFamily = FontFamily(Font(R.font.urbanist)),
                 fontWeight = FontWeight(700),
                 color = Color(0xFFFF0000),
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.Start
             ),
             modifier = Modifier
                 .wrapContentWidth()
@@ -182,7 +175,6 @@ fun ForgetPasswordScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
 
             OutlinedTextField(
                 value = email,
@@ -200,7 +192,7 @@ fun ForgetPasswordScreen() {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .offset(0.dp, -5.dp),
+                            .offset(0.dp, (-5).dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
@@ -232,21 +224,45 @@ fun ForgetPasswordScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
             Button(
                 onClick = {
                     if (email.isNotBlank()) {
                         isLoading = true
                         errorMessage = null
-                        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                            .addOnCompleteListener { task ->
-                                isLoading = false
-                                if (task.isSuccessful) {
-                                    val intent = Intent(context, ForgetPassEmailSendActivity::class.java)
-                                    context.startActivity(intent)
+
+                        // Verificar se o email existe
+                        db.collection("AccountsManager")
+                            .whereEqualTo("email", email)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                if (documents.isEmpty) {
+                                    isLoading = false
+                                    errorMessage = "E-mail não encontrado"
                                 } else {
-                                    errorMessage = task.exception?.message ?: "Falha ao enviar e-mail"
+                                    val userDoc = documents.first()
+                                    val hasEmailVerified = userDoc.getBoolean("hasEmailVerified") ?: false
+
+                                    if (!hasEmailVerified) {
+                                        isLoading = false
+                                        errorMessage = "O e-mail precisa ser verificado antes de redefinir a senha"
+                                    } else {
+                                        // enviar o link de redefinição de senha
+                                        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                                            .addOnCompleteListener { task ->
+                                                isLoading = false
+                                                if (task.isSuccessful) {
+                                                    val intent = Intent(context, ForgetPassEmailSendActivity::class.java)
+                                                    context.startActivity(intent)
+                                                } else {
+                                                    errorMessage = task.exception?.message ?: "Falha ao enviar e-mail"
+                                                }
+                                            }
+                                    }
                                 }
+                            }
+                            .addOnFailureListener { exception ->
+                                isLoading = false
+                                errorMessage = "Erro ao verificar o e-mail: ${exception.message}"
                             }
                     } else {
                         errorMessage = "Digite um e-mail válido"
@@ -278,12 +294,11 @@ fun ForgetPasswordScreen() {
                             fontFamily = FontFamily(Font(R.font.urbanist)),
                             fontWeight = FontWeight(600),
                             color = Color.White,
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Center
                         )
                     )
                 }
             }
-
 
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -304,9 +319,7 @@ fun ForgetPasswordScreen() {
             }
         }
 
-
         Spacer(modifier = Modifier.weight(1f))
-
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -331,7 +344,6 @@ fun ForgetPasswordScreen() {
 
             Spacer(modifier = Modifier.width(7.dp))
 
-            // Botão que vai para a activity de Login
             Text(
                 text = "Entrar",
                 style = TextStyle(

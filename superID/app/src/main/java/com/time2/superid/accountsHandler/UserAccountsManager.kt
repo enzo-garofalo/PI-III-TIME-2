@@ -46,7 +46,6 @@ class UserAccountsManager {
                 )
 
                 saveUserToFirestore(userAccount, context)
-                showShortToast(context, "Verifique seu email")
                 context.startActivity(Intent(context, EmailValidationActivity::class.java))
             }
             .addOnFailureListener { e ->
@@ -160,6 +159,4 @@ class UserAccountsManager {
                 showShortToast(context, "Erro ao salvar dados do usuário")
             }
     }
-
-
 }
