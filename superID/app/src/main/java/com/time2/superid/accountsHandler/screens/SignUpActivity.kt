@@ -36,9 +36,8 @@ import com.time2.superid.R
 import com.time2.superid.utils.redirectIfLogged
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.rememberScrollState
-import com.time2.superid.ui.components.utils.rememberImeState
+import androidx.compose.foundation.verticalScroll
 
 class SignUpActivity : ComponentActivity() {
     private val TAG: String = "SIGN_UP"
@@ -89,19 +88,13 @@ fun SignUpView( modifier: Modifier = Modifier)
     var isLoading by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val imeState = rememberImeState()
     val scrollState = rememberScrollState()
 
-    // Joga o teclado para baixo do conteudo
-    LaunchedEffect(key1 = imeState.value) {
-        if (imeState.value) {
-            scrollState.animateScrollTo(scrollState.maxValue, tween(300))
-        }
-    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .background(color = Color(0xFFFFFFFF))
             .padding(start = 22.dp, top = 30.dp, end = 22.dp, bottom = 30.dp),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -252,16 +245,6 @@ fun SignUpView( modifier: Modifier = Modifier)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = "* Mínimo 6 caracteres",
-            style = TextStyle(
-                fontSize = 15.sp,
-                fontFamily = FontFamily(Font(R.font.urbanist)),
-                fontWeight = FontWeight(600),
-                color = Color(0xFF6A707C),
-                textAlign = TextAlign.Start
-            )
-        )
 
         // Campo de Senha
         OutlinedTextField(
@@ -316,6 +299,17 @@ fun SignUpView( modifier: Modifier = Modifier)
                 }
             }
         )
+
+            Text(
+                text = "* Mínimo 6 caracteres",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.urbanist)),
+                    fontWeight = FontWeight(600),
+                    color = Color(0xFF6A707C),
+                    textAlign = TextAlign.Start
+                )
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 

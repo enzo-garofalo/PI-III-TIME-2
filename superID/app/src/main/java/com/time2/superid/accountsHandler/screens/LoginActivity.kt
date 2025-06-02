@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +63,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.time2.superid.HomeActivity
 import com.time2.superid.R
-import com.time2.superid.ui.components.utils.rememberImeState
 import com.time2.superid.utils.redirectIfLogged
 
 
@@ -133,19 +131,13 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var passwordVisible by remember { mutableStateOf(false) }
-    val imeState = rememberImeState()
     val scrollState = rememberScrollState()
 
-    // Joga o teclado para baixo do conteudo
-    LaunchedEffect(key1 = imeState.value) {
-        if (imeState.value) {
-            scrollState.animateScrollTo(scrollState.maxValue, tween(300))
-        }
-    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .background(color = Color(0xFFFFFFFF))
             .padding(start = 22.dp, top = 30.dp, end = 22.dp, bottom = 30.dp),
         verticalArrangement = Arrangement.SpaceBetween,
