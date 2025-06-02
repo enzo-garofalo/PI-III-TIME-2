@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
 import com.time2.superid.accountsHandler.UserAccountsManager
-import com.time2.superid.utils.showShortToast
 import com.time2.superid.R
 import com.time2.superid.utils.redirectIfLogged
 import androidx.core.view.WindowInsetsCompat
@@ -89,6 +88,7 @@ fun SignUpView( modifier: Modifier = Modifier)
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
 
     Column(
@@ -416,13 +416,13 @@ fun SignUpView( modifier: Modifier = Modifier)
         Button(
             onClick = {
                 if( email.isBlank() || name.isBlank() || password.isBlank() || confirmPassword.isBlank() ){
-                    showShortToast(context, "Please fill in all the fields!")
+                    errorMessage = "Preencha todos os campos"
                 }else if(!useTerms){
-                    showShortToast(context, "Accept Terms of Use")
+                    errorMessage = "Aceite os termos de uso"
                 }else if(password != confirmPassword){
-                    showShortToast(context,"Passwords do not match")
+                    errorMessage = "As senhas não correspondem"
                 }else if(password.length < 6){
-                    showShortToast(context, "password must have at least 6 characters")
+                    errorMessage = "A senha deve ter no mínimo 6 caracteres"
                 }else{
                     val userAccountsManager = UserAccountsManager()
                     userAccountsManager.createUserAccount(email, password, name, context)
@@ -455,6 +455,25 @@ fun SignUpView( modifier: Modifier = Modifier)
                         fontWeight = FontWeight(600),
                         color = Color.White,
                         textAlign = TextAlign.Center,
+                    )
+                )
+            }
+        }
+
+        // Mensagem de erro
+        errorMessage?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = it,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontFamily = FontFamily(Font(R.font.urbanist)),
+                        fontWeight = FontWeight(600),
+                        color = MaterialTheme.colorScheme.error
                     )
                 )
             }
