@@ -36,9 +36,13 @@ import com.time2.superid.utils.fetchUserProfile
 import com.time2.learningui_ux.components.buildBottomBar
 import com.time2.learningui_ux.components.buildTopAppBar
 import android.app.Activity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
+import com.time2.superid.settingsHandler.FontPreferenceHelper
+import com.time2.superid.ui.theme.SuperIDTheme
 
 
 @SuppressLint("ContextCastToActivity")
@@ -50,9 +54,13 @@ fun SettingsScreen(
     onLogout: () -> Unit,
     onReadTermsClick: () -> Unit
 ) {
+    val context = LocalContext.current
     var showModal by remember { mutableStateOf(false) }
-    var userName  by remember { mutableStateOf("Carregando...") }
+    var userName by remember { mutableStateOf("Carregando...") }
     var isLoading by remember { mutableStateOf(true) }
+
+    // Carregar preferência inicial do tamanho da fonte
+    var isLargeFont by remember { mutableStateOf(FontPreferenceHelper.isLargeFont(context)) }
 
     LaunchedEffect(Unit) {
         fetchUserProfile(auth, userAccountsManager) { name ->
@@ -61,42 +69,55 @@ fun SettingsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            buildTopAppBar(
+    // Aplicar o tema com base na preferência
+    SuperIDTheme(isLargeFont = isLargeFont) {
+        Scaffold(
+            topBar = {
+                buildTopAppBar(
+                    userName = userName,
+                    showBackClick = true,
+                    onBackClick = onBack,
+                    onLogoutClick = { showModal = true }
+                )
+            },
+            bottomBar = {
+                buildBottomBar(LocalContext.current as Activity, selectedIndex = 2)
+            }
+        ) { innerPadding ->
+            SettingsContent(
+                modifier = Modifier.padding(innerPadding),
                 userName = userName,
-                showBackClick = true,
-                onBackClick = onBack,
-                onLogoutClick = { showModal = true }
+                onLogoutClick = { showModal = true },
+                onReadTermsClick = onReadTermsClick,
+                isLargeFont = isLargeFont,
+                onToggleFontSize = {
+                    isLargeFont = !isLargeFont
+                    FontPreferenceHelper.setLargeFont(context, isLargeFont)
+                    // Reiniciar a Activity para propagar o novo tema (opcional)
+                    (context as? Activity)?.recreate()
+                }
             )
-        },
-        bottomBar = {
-            buildBottomBar(LocalContext.current as Activity, selectedIndex = 2)
         }
-    ) { innerPadding ->
-        SettingsContent(
-            modifier = Modifier.padding(innerPadding),
-            userName = userName,
-            onLogoutClick = { showModal = true },
-            onReadTermsClick = { onReadTermsClick() }
-        )
-    }
 
-    if (showModal) {
-        buildBottomModal(
-            onDismiss = { showModal = false },
-            currentModal = "logOutModal",
-            onLogout = onLogout
-        )
+        if (showModal) {
+            buildBottomModal(
+                onDismiss = { showModal = false },
+                currentModal = "logOutModal",
+                onLogout = onLogout
+            )
+        }
     }
 }
+
 
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
     userName: String,
     onLogoutClick: () -> Unit,
-    onReadTermsClick: () -> Unit
+    onReadTermsClick: () -> Unit,
+    isLargeFont: Boolean,
+    onToggleFontSize: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -122,6 +143,12 @@ fun SettingsContent(
 
         Spacer(modifier = Modifier.height(15.dp))
 
+        Button(onClick = onToggleFontSize) {
+            Text(if (isLargeFont) "Diminuir Fonte" else "Aumentar Fonte")
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
         Button(
             onClick = onLogoutClick,
             shape = RoundedCornerShape(50),
@@ -140,14 +167,9 @@ fun SettingsContent(
             )
         }
 
-
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(
-            onClick = {
-                onReadTermsClick()
-            }
-        ) {
+        TextButton(onClick = onReadTermsClick) {
             Text(
                 text = "Ler Termos de Uso",
                 fontSize = 14.sp,
@@ -157,4 +179,6 @@ fun SettingsContent(
         }
     }
 }
+
+
 

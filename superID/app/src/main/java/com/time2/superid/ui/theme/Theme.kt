@@ -11,6 +11,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.sp
 import com.time2.superid.R
 
 private val DarkColorScheme = darkColorScheme(
@@ -56,24 +57,28 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun SuperIDTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    isLargeFont: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val typography = if (isLargeFont) {
+        Typography.copy(
+            bodyLarge = Typography.bodyLarge.copy(fontSize = 20.sp, lineHeight = 28.sp),
+            bodySmall = Typography.bodySmall.copy(fontSize = 14.sp, lineHeight = 20.sp),
+
+            titleSmall = Typography.titleSmall.copy(fontSize = 22.sp, lineHeight = 28.sp),
+            titleMedium = Typography.titleMedium.copy(fontSize = 24.sp, lineHeight = 30.sp),
+            titleLarge = Typography.titleLarge.copy(fontSize = 26.sp, lineHeight = 32.sp),
+
+            labelSmall = Typography.labelSmall.copy(fontSize = 13.sp, lineHeight = 18.sp)
+        )
+    } else {
+        Typography
     }
 
     MaterialTheme(
         colorScheme = LightColorScheme,
-        typography = Typography,
+        typography = typography,
         content = content
     )
 }

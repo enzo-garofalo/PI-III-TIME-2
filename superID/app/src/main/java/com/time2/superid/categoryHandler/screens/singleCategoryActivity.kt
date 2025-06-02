@@ -48,6 +48,7 @@ import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.settingsHandler.FontPreferenceHelper
 import com.time2.superid.ui.components.category.CategoryIcon
 import com.time2.superid.ui.components.category.IconSelectField
 import com.time2.superid.ui.components.structure.CustomTextField
@@ -65,8 +66,9 @@ class SingleCategoryActivity : ComponentActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SuperIDTheme {
-                val coroutineScope = rememberCoroutineScope()
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+            SuperIDTheme(isLargeFont = isLargeFont) {
                 var reloadTrigger by remember { mutableStateOf(false) }
                 val categoryId = intent.getStringExtra("categoryId")
 

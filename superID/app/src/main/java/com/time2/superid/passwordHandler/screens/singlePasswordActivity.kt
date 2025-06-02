@@ -45,6 +45,7 @@ import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
 import com.time2.superid.qrCodeHandler.screens.qrCodeScanActivity
+import com.time2.superid.settingsHandler.FontPreferenceHelper
 import com.time2.superid.ui.components.structure.CustomTextField
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
@@ -60,7 +61,9 @@ class SinglePasswordActivity : ComponentActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SuperIDTheme {
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+            SuperIDTheme(isLargeFont = isLargeFont) {
                 val coroutineScope = rememberCoroutineScope()
 
                 var password by remember { mutableStateOf<Password?>(null) }

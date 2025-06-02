@@ -35,6 +35,8 @@ import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.categoryHandler.screens.SingleCategoryActivity
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.settingsHandler.FontPreferenceHelper
+import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import kotlinx.coroutines.launch
 
@@ -48,7 +50,9 @@ class PasswordsByCategoryActivity : ComponentActivity()
 
         super.onCreate(savedInstanceState)
         setContent {
-            com.time2.superid.ui.theme.SuperIDTheme {
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+            SuperIDTheme(isLargeFont = isLargeFont){
 
                 val categoryId = intent.getStringExtra("categoryID")
                 if (categoryId.isNullOrEmpty()) {

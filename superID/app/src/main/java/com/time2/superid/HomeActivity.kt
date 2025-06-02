@@ -28,6 +28,7 @@ import com.time2.superid.categoryHandler.Category
 import com.time2.superid.categoryHandler.CategoryManager
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.settingsHandler.FontPreferenceHelper
 import kotlinx.coroutines.launch
 
 class HomeActivity : ComponentActivity() {
@@ -39,7 +40,11 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SuperIDTheme {
+
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+
+            SuperIDTheme(isLargeFont = isLargeFont) {
                 val coroutineScope = rememberCoroutineScope()
                 var showModal by remember { mutableStateOf(false) }
                 var userName by remember { mutableStateOf("Carregando...") }

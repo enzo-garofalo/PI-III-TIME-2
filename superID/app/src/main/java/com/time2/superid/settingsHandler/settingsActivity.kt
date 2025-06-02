@@ -23,7 +23,10 @@ class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SuperIDTheme {
+            
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+            SuperIDTheme(isLargeFont = isLargeFont) {
                 SettingsScreen(
                     auth = auth,
                     userAccountsManager = userAccountsManager,

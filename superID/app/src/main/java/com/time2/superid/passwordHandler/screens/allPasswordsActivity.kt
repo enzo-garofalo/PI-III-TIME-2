@@ -29,6 +29,7 @@ import com.time2.superid.accountsHandler.UserAccountsManager
 import com.time2.superid.accountsHandler.screens.LoginActivity
 import com.time2.superid.passwordHandler.Password
 import com.time2.superid.passwordHandler.PasswordManager
+import com.time2.superid.settingsHandler.FontPreferenceHelper
 import com.time2.superid.ui.theme.SuperIDTheme
 import com.time2.superid.utils.fetchUserProfile
 import kotlinx.coroutines.launch
@@ -40,7 +41,9 @@ class AllPasswordsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SuperIDTheme {
+            val isLargeFont = FontPreferenceHelper.isLargeFont(this)
+
+            SuperIDTheme(isLargeFont = isLargeFont) {
                 val coroutineScope = rememberCoroutineScope()
                 var showModal by remember { mutableStateOf(false) }
                 var userName by remember { mutableStateOf("Carregando...") }
